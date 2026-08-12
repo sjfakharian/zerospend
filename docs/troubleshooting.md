@@ -1,7 +1,7 @@
 # Troubleshooting
 
-- **npm EACCES:** configure a user-level npm prefix; do not use `sudo npm`.
-- **Homebrew permissions:** repair only the specific path Homebrew identifies; never recursively change all of `/usr/local`.
+- **npm EACCES:** do not use `sudo npm`. When a global install is truly required, use a user-owned prefix: `mkdir -p "$HOME/.local" && npm config set prefix "$HOME/.local"`, and add `$HOME/.local/bin` to `PATH`. ZeroSpend itself creates its launcher there and does not require global npm installation.
+- **Homebrew permissions:** inspect the exact directory Homebrew names (for example `/usr/local/lib/pkgconfig`) and its owner. If ownership is genuinely stale, repair only that path; never recursively change all of `/usr/local`. Hermes may work without optional `ripgrep`/`ffmpeg` features until those dependencies are repaired.
 - **Node/OpenSSL errors:** reinstall or relink the affected formula, then verify `node --version`.
 - **uv/PyPI timeout:** retry on a stable connection or increase the package-manager timeout; avoid disabling TLS.
 - **Playwright:** install the required browser with the official Playwright command.

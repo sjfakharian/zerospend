@@ -24,11 +24,11 @@ flowchart LR
   H[Hermes Agent] --> R[ZeroSpend Router :20129]
   T[TypingMind] --> R
   O[OpenAI-compatible client] --> R
-  R --> N[9Router :20128]
-  N --> OR[OpenRouter free]
-  N --> OC[OpenCode free]
+  R --> OR[OpenRouter free]
+  R --> OC[OpenCode free / advanced]
   R --> NV[NVIDIA Free Endpoint]
   R -. optional discovery .-> OM[OmniRoute :20130]
+  R -. optional gateway .-> N[9Router :20128]
   R -. metadata only .-> C[ZeroSpend Console :20131]
 ```
 
@@ -42,9 +42,10 @@ cd zerospend
 ./install.sh
 zerospend setup
 zerospend doctor
-zerospend discover
-zerospend benchmark --dry-run
+npm run console
 ```
+
+Open `http://127.0.0.1:20131`, add one provider in Providers, test it, and run discovery. 9Router, OmniRoute, and OpenCode are not required for first success.
 
 Try the console without API keys:
 

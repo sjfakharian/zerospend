@@ -13,11 +13,16 @@ git clone https://github.com/sjfakharian/zerospend.git
 cd zerospend
 ./install.sh
 zerospend setup
+npm run console
 ```
 
 This creates `~/.zerospend/{config,secrets,data,logs,state,backups,runtime}` and a local client token without printing it.
 
-## Enter credentials safely
+Open `http://127.0.0.1:20131`, choose Providers, and add one OpenRouter or NVIDIA credential. Test the connection, run discovery, then run `zerospend doctor` and start the router. Keys are write-only and never returned to the browser after saving.
+
+OpenRouter documents API-key creation at [OpenRouter API authentication](https://openrouter.ai/docs/api/reference/authentication). You need only one working provider for first success.
+
+## Advanced manual credential entry
 
 ```bash
 read -s "provider_key?Provider key: "
@@ -30,11 +35,11 @@ chmod 600 "$HOME/.zerospend/secrets/openrouter.token"
 
 Never paste keys into issues. Repeat with the documented filename for each enabled provider.
 
-## External components
+## Optional external components
 
-Install Hermes Agent, 9Router, and optional OmniRoute from their official distributions. ZeroSpend does not vendor them. Keep 9Router on loopback port `20128` and OmniRoute on `20130`; review current upstream licenses and instructions.
+ZeroSpend routes directly to providers by default. 9Router is an optional advanced gateway and OmniRoute is optional discovery/capacity infrastructure; neither is required. ZeroSpend does not vendor them.
 
-OpenRouter routes require explicit `:free` IDs and zero input/output prices. OpenCode needs current advertised-free evidence plus availability. NVIDIA needs the current `Free Endpoint` label, authenticated catalog membership, and a bounded chat probe.
+OpenRouter routes require explicit `:free` IDs and zero input/output prices. OpenCode is experimental/advanced: its official flow uses `/connect` with integration-specific API key, OAuth, or environment methods, so ZeroSpend does not invent a generic credential source. NVIDIA needs the current `Free Endpoint` label, authenticated catalog membership, and a bounded chat probe.
 
 ## Routing, discovery, and benchmarking
 
