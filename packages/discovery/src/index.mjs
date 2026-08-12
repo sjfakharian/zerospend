@@ -25,16 +25,16 @@ export async function discoverConfigured(options = {}) {
       for (const [name, setting] of Object.entries(config.providers || {})) {
         if (!setting.enabled || name === 'omniroute') continue;
         const apiKey = options.apiKeys?.[name] ?? await secret(setting.secret_file).catch(() => '');
-        if (!apiKey && name !== 'openrouter') { providerResults[name] = { status: 'SKIPPED', reason: 'credential not configured' }; continue; }
-        const adapter = adapters[name] || (name === 'openrouter' ? new OpenRouterProvider({ baseUrl: setting.base_url, apiKey }) : name === 'opencode' ? new OpenCodeProvider({ baseUrl: setting.base_url, apiKey }) : name === 'nvidia' ? new NvidiaProvider({ baseUrl: setting.base_url, apiKey }) : null);
+        if (!apiKey && setting.auth_mode !== 'none' && name !== 'openrouter') { providerResults[name] = { status: 'SKIPPED', reason: 'credential not configured' }; continue; }
+        const adapter = adapters[name] || (name === 'openrouter' ? new OpenRouterProvider({ baseUrl: setting.base_url, apiKey }) : name === 'opencode' ? new OpenCodeProvider({ baseUrl: setting.base_url, apiKey }) : name === 'nvidia' ? new NvidiaProvider({ baseUrl: setting.base_url, apiKey }) : name === 'opencode-free' ? new OpenCodeProvider({ baseUrl: setting.base_url, apiKey:'' }) : null);
         if (!adapter) continue;
         const models = await adapter.discover(), evidence = adapter.freeEvidence ? await adapter.freeEvidence() : null;
         let eligible = 0;
         for (const model of models) {
-          const free = name === 'nvidia' ? await adapter.verifyFree(model, { label: evidence.has(model.id) ? 'Free Endpoint' : null, current: true }) : await adapter.verifyFree(model, evidence);
+          const free = name === 'nvidia' ? await adapter.verifyFree(model, { label: evidence.has(model.id) ? 'Free Endpoint' : null, current: true }) : name==='opencode-free'?model.id.includes('opencode')&&model.id.includes('free'):await adapter.verifyFree(model, evidence);
           if (!free) { rejected[`${name}/${model.id}`] = { provider: name, reason: 'UNKNOWN COST = NOT FREE' }; continue; }
           const health = await adapter.healthCheck(model.id);
-          const item = normalizeRoute({ provider: name, backend: name, model: { ...model, capabilities: capability(adapter, model) }, baseUrl: setting.base_url, secretFile: setting.secret_file, evidence: name === 'nvidia' ? 'current official Free Endpoint label plus live catalog' : name === 'openrouter' ? 'explicit :free ID and zero prompt/completion pricing' : 'current advertised-free evidence plus live catalog', available: health });
+          const item = normalizeRoute({ provider: name, backend: setting.backend||name, model: { ...model, capabilities: capability(adapter, model) }, baseUrl: setting.base_url, secretFile: setting.secret_file, evidence: name === 'nvidia' ? 'current official Free Endpoint label plus live catalog' : name === 'openrouter' ? 'explicit :free ID and zero prompt/completion pricing' : name==='opencode-free'?'explicit OpenCode Free route from local 9Router catalog':'current advertised-free evidence plus live catalog', available: health });
           if (item.production_eligible) { routes[item.route] = item; eligible += 1; } else rejected[item.route] = { ...item, reason: 'bounded availability check failed' };
         }
         providerResults[name] = { status: 'PASS', discovered: models.length, eligible };
