@@ -1,0 +1,19 @@
+name: Bug report
+description: Report a reproducible ZeroSpend defect
+body:
+  - type: textarea
+    attributes:
+      label: Reproduction
+      description: Use synthetic data and redact credentials.
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: ZeroSpend version
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Expected and actual behavior
+    validations:
+      required: true

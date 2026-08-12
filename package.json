@@ -1,0 +1,20 @@
+{
+  "name": "zerospend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "bin": { "zerospend": "./cli/zerospend.mjs" },
+  "scripts": {
+    "start": "node packages/router/src/server.mjs",
+    "console": "node apps/console/server.mjs",
+    "demo": "ZEROSPEND_DEMO=1 node apps/console/server.mjs",
+    "test": "node --test tests/unit/*.test.mjs tests/integration/*.test.mjs",
+    "lint": "node scripts/lint.mjs",
+    "typecheck": "node --check packages/router/src/server.mjs && node --check apps/console/server.mjs && node --check cli/zerospend.mjs",
+    "build": "node scripts/build.mjs",
+    "docs:build": "node scripts/build-docs.mjs",
+    "doctor": "node cli/zerospend.mjs doctor"
+  },
+  "license": "MIT"
+}

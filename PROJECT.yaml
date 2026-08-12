@@ -1,0 +1,5 @@
+name: zerospend
+version: 0.1.0
+status: public_open_source
+license: MIT
+runtime_namespace: ~/.zerospend
