@@ -47,6 +47,8 @@ npm run console
 
 Open `http://127.0.0.1:20131`, add one provider in Providers, test it, and run discovery. 9Router, OmniRoute, and OpenCode are not required for first success.
 
+Terminal-first users can run `zerospend provider add`, followed by `zerospend provider test openrouter` and `zerospend providers`. API keys are collected through hidden terminal input, never command arguments.
+
 Try the console without API keys:
 
 ```bash

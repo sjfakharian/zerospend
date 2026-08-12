@@ -20,6 +20,17 @@ This creates `~/.zerospend/{config,secrets,data,logs,state,backups,runtime}` and
 
 Open `http://127.0.0.1:20131`, choose Providers, and add one OpenRouter or NVIDIA credential. Test the connection, run discovery, then run `zerospend doctor` and start the router. Keys are write-only and never returned to the browser after saving.
 
+The terminal provides the same shared provider manager:
+
+```bash
+zerospend provider add
+zerospend provider test openrouter
+zerospend provider status
+zerospend provider remove openrouter
+```
+
+Bearer credentials use hidden input and are never accepted as command arguments. `opencode-free` is a separate no-auth provider exposed through optional 9Router; it never creates `opencode.token` and does not substitute OpenCode Zen.
+
 OpenRouter documents API-key creation at [OpenRouter API authentication](https://openrouter.ai/docs/api/reference/authentication). You need only one working provider for first success.
 
 ## Advanced manual credential entry
