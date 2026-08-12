@@ -51,6 +51,8 @@ Terminal-first users can run `zerospend provider add`, followed by `zerospend pr
 
 Run `zerospend components` for a credential-free inventory of Router, Console, Hermes, 9Router, and optional OmniRoute. Hermes is the recommended client; 9Router is recommended only when enabling OpenCode Free no-auth.
 
+OpenCode Free candidates are discovered dynamically from provider-specific 9Router metadata and bounded probes. No changing external model ID is hardcoded as authoritative, and OpenCode Zen is never a fallback.
+
 Try the console without API keys:
 
 ```bash

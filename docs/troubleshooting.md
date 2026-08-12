@@ -11,5 +11,6 @@
 - **Port collision:** identify the listener and change ZeroSpend’s configured port; never kill an unrelated process automatically.
 - **429/free quota exhausted:** wait for provider reset or use another independently verified-free fallback.
 - **`~/.local/bin` missing from PATH:** add `export PATH="$HOME/.local/bin:$PATH"` to your shell profile, then open a new terminal.
-- **9Router installed but offline:** run `9router --no-browser`, verify `http://127.0.0.1:20128`, then use a reviewed user LaunchAgent if persistence is needed. Direct OpenRouter/NVIDIA routes remain available without it.
+- **9Router installed but offline:** run `9router --tray --host 127.0.0.1 --port 20128`, verify the listener is loopback-only, then use the reviewed user LaunchAgent template if persistence is needed. `--no-browser` does not background the process. Direct OpenRouter/NVIDIA routes remain available without it.
+- **OpenCode Free returns 406:** the selected model is stale. ZeroSpend marks it unavailable, performs at most one cooldown-bounded inventory refresh, and tries only another currently verified OpenCode Free model. If none remains it returns `FREE_CAPACITY_UNAVAILABLE`.
 - **OpenCode Free unavailable:** it is a no-auth 9Router backend, not OpenCode Zen. Start/configure 9Router; never create `opencode.token` for this route.

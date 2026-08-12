@@ -35,7 +35,9 @@ Bearer credentials use hidden input and are never accepted as command arguments.
 
 Hermes is the recommended client, while any OpenAI-compatible client remains supported. The current official Hermes installer is shown for confirmation but is never executed silently. Prefer the official packaged macOS Desktop installer; source compilation is advanced.
 
-9Router is recommended only for OpenCode Free no-auth. Direct OpenRouter and NVIDIA do not depend on it. Current official 9Router documentation uses `npm install -g 9router` and `9router --no-browser`; ZeroSpend first checks whether the active npm prefix is user-writable and never recommends `sudo npm`. For persistence, use the reviewed user LaunchAgent approach only after confirming the installed command; no secrets belong in its plist.
+9Router is recommended only for OpenCode Free no-auth. Direct OpenRouter and NVIDIA do not depend on it. Current official 9Router documentation uses `npm install -g 9router`; persistent/background mode is `9router --tray --host 127.0.0.1 --port 20128`. `--no-browser` only suppresses browser launch and is not background mode. ZeroSpend first checks whether the active npm prefix is user-writable and never recommends `sudo npm`. Any user LaunchAgent must use the absolute executable path, explicit loopback host, explicit port, user-owned logs, and no secrets.
+
+OpenCode Free model membership is dynamic. Run `zerospend discover` and `zerospend models` to inspect the current timestamped, bounded-probe-verified inventory. ZeroSpend does not designate a permanent recommended test model. OpenCode Zen is a separate path and is never substituted as a free fallback.
 
 OpenRouter documents API-key creation at [OpenRouter API authentication](https://openrouter.ai/docs/api/reference/authentication). You need only one working provider for first success.
 
