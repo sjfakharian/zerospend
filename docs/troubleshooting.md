@@ -10,3 +10,6 @@
 - **CORS/token mismatch:** verify the configured origin and local bearer token without printing it.
 - **Port collision:** identify the listener and change ZeroSpend’s configured port; never kill an unrelated process automatically.
 - **429/free quota exhausted:** wait for provider reset or use another independently verified-free fallback.
+- **`~/.local/bin` missing from PATH:** add `export PATH="$HOME/.local/bin:$PATH"` to your shell profile, then open a new terminal.
+- **9Router installed but offline:** run `9router --no-browser`, verify `http://127.0.0.1:20128`, then use a reviewed user LaunchAgent if persistence is needed. Direct OpenRouter/NVIDIA routes remain available without it.
+- **OpenCode Free unavailable:** it is a no-auth 9Router backend, not OpenCode Zen. Start/configure 9Router; never create `opencode.token` for this route.

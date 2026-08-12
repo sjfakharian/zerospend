@@ -49,6 +49,8 @@ Open `http://127.0.0.1:20131`, add one provider in Providers, test it, and run d
 
 Terminal-first users can run `zerospend provider add`, followed by `zerospend provider test openrouter` and `zerospend providers`. API keys are collected through hidden terminal input, never command arguments.
 
+Run `zerospend components` for a credential-free inventory of Router, Console, Hermes, 9Router, and optional OmniRoute. Hermes is the recommended client; 9Router is recommended only when enabling OpenCode Free no-auth.
+
 Try the console without API keys:
 
 ```bash

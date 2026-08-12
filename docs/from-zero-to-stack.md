@@ -31,6 +31,12 @@ zerospend provider remove openrouter
 
 Bearer credentials use hidden input and are never accepted as command arguments. `opencode-free` is a separate no-auth provider exposed through optional 9Router; it never creates `opencode.token` and does not substitute OpenCode Zen.
 
+`zerospend setup` detects macOS architecture, Node/npm, the user npm prefix, Hermes, 9Router, Router, Console, and optional OmniRoute. `zerospend components` repeats the component inventory without exposing configuration or credentials.
+
+Hermes is the recommended client, while any OpenAI-compatible client remains supported. The current official Hermes installer is shown for confirmation but is never executed silently. Prefer the official packaged macOS Desktop installer; source compilation is advanced.
+
+9Router is recommended only for OpenCode Free no-auth. Direct OpenRouter and NVIDIA do not depend on it. Current official 9Router documentation uses `npm install -g 9router` and `9router --no-browser`; ZeroSpend first checks whether the active npm prefix is user-writable and never recommends `sudo npm`. For persistence, use the reviewed user LaunchAgent approach only after confirming the installed command; no secrets belong in its plist.
+
 OpenRouter documents API-key creation at [OpenRouter API authentication](https://openrouter.ai/docs/api/reference/authentication). You need only one working provider for first success.
 
 ## Advanced manual credential entry
