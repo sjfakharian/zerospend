@@ -49,7 +49,7 @@ export async function discoverConfigured(options = {}) {
       if (!Object.keys(previous.routes || {}).length) throw error;
       return { ...previous, discovery_error: error.message, previous_inventory_preserved: true };
     }
-  });
+  }, { onRecovered: options.onLockRecovered });
 }
 
 export async function discoverOpenRouter() { return Object.values((await discoverConfigured()).routes).filter(route => route.provider === 'openrouter'); }
