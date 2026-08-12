@@ -37,7 +37,8 @@ export async function discoverConfigured(options = {}) {
           const item = normalizeRoute({ provider: name, backend: setting.backend||name, model: { ...model, capabilities: capability(adapter, model) }, baseUrl: setting.base_url, secretFile: setting.secret_file, evidence: name === 'nvidia' ? 'current official Free Endpoint label plus live catalog' : name === 'openrouter' ? 'explicit :free ID and zero prompt/completion pricing' : name==='opencode-free'?free.source:'current advertised-free evidence plus live catalog', available: health });
           if (item.production_eligible) { routes[item.route] = item; eligible += 1; } else rejected[item.route] = { ...item, reason: 'bounded availability check failed',error_class:health.error_class||'local_probe_rejected',local_model_id:health.local_model_id||null };
         }
-        providerResults[name] = { status: eligible?'PASS':'UNAVAILABLE', discovered: discovered.length,probed:models.length, eligible,error_class:eligible?null:Object.values(rejected).filter(item=>item.provider===name).at(-1)?.error_class||null };
+        const failures=Object.values(rejected).filter(item=>item.provider===name),allRateLimited=failures.length>0&&failures.every(item=>item.error_class==='local_rate_limited');
+        providerResults[name] = { status: eligible?'PASS':allRateLimited?'TEMPORARY_CAPACITY':'UNAVAILABLE', discovered: discovered.length,probed:models.length, eligible,error_class:eligible?null:allRateLimited?'temporary_free_capacity_unavailable':failures.at(-1)?.error_class||null };
       }
       if (!Object.keys(routes).length) throw Error('no configured provider produced verified-free capacity');
       const inventory = { schema_version: 2, verified_at: now(), policy: 'UNKNOWN COST = NOT FREE', providers: providerResults, routes, rejected };
