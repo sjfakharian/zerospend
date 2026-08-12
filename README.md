@@ -4,7 +4,7 @@
 
 [![CI](https://github.com/sjfakharian/zerospend/actions/workflows/ci.yml/badge.svg)](https://github.com/sjfakharian/zerospend/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE) [![Node 22+](https://img.shields.io/badge/node-22%2B-5FA04E)](package.json) [![macOS](https://img.shields.io/badge/platform-macOS-lightgrey)](docs/installation/macos.md) [![Release](https://img.shields.io/github/v/release/sjfakharian/zerospend)](https://github.com/sjfakharian/zerospend/releases)
 
-[![ZeroSpend synthetic routing demo](docs/assets/routing-demo.svg)](docs/dashboard.md)
+[![ZeroSpend synthetic routing demo](docs/public/overview.svg)](docs/dashboard.md)
 
 ZeroSpend combines deterministic task routing, current zero-cost evidence, bounded model evaluation, runtime reliability feedback, provider fallback, and a metadata-only local console. It supports Hermes Agent, TypingMind, and generic OpenAI-compatible clients without logging prompts.
 
@@ -59,6 +59,8 @@ Try the console without API keys:
 npm run demo
 # http://127.0.0.1:20131
 ```
+
+The polished local console includes Overview, Live Routing, Models, Routing, Benchmarks, Usage, Providers, Safety, Automation, and Settings. Its bundled demo is explicitly synthetic; live mode reads only local operational metadata.
 
 ## How routing works
 
