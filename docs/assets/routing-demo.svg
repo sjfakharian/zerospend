@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="230" viewBox="0 0 960 230" role="img" aria-labelledby="title desc">
+  <title id="title">ZeroSpend synthetic routing demo</title>
+  <desc id="desc">A request is classified as SQL, routed to a verified free model, falls back after a rate limit, and produces metadata in the local console.</desc>
+  <style>
+    .bg{fill:#09111f}.box{fill:#111d31;stroke:#38537a;stroke-width:2}.ok{stroke:#35d07f}.warn{stroke:#f4b942}.text{fill:#e8eef8;font:15px ui-monospace,SFMono-Regular,monospace}.small{fill:#9db0ca;font:12px ui-monospace,SFMono-Regular,monospace}.flow{fill:none;stroke:#5ea2ff;stroke-width:3;stroke-dasharray:10 8;animation:move 1.2s linear infinite}@keyframes move{to{stroke-dashoffset:-36}}
+  </style>
+  <rect class="bg" width="960" height="230" rx="18"/>
+  <text class="text" x="30" y="35">ZeroSpend / synthetic demo / no provider traffic</text>
+  <path class="flow" d="M160 115H218M368 115H426M576 115H634M784 115H842"/>
+  <g><rect class="box" x="30" y="75" width="130" height="80" rx="12"/><text class="text" x="54" y="108">request</text><text class="small" x="47" y="133">SELECT + JOIN</text></g>
+  <g><rect class="box ok" x="218" y="75" width="150" height="80" rx="12"/><text class="text" x="249" y="108">classify</text><text class="small" x="255" y="133">free-sql</text></g>
+  <g><rect class="box warn" x="426" y="75" width="150" height="80" rx="12"/><text class="text" x="451" y="108">primary 429</text><text class="small" x="462" y="133">rate limit</text></g>
+  <g><rect class="box ok" x="634" y="75" width="150" height="80" rx="12"/><text class="text" x="664" y="108">fallback</text><text class="small" x="660" y="133">verified free</text></g>
+  <g><rect class="box ok" x="842" y="75" width="88" height="80" rx="12"/><text class="text" x="857" y="108">Console</text><text class="small" x="853" y="133">metadata</text></g>
+  <text class="small" x="30" y="200">request → semantic category → provider/model → fallback → local observability</text>
+</svg>
