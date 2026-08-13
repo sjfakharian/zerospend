@@ -3,8 +3,12 @@
   "version": "0.2.0",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=22" },
-  "bin": { "zerospend": "./cli/zerospend.mjs" },
+  "engines": {
+    "node": ">=22"
+  },
+  "bin": {
+    "zerospend": "./cli/zerospend.mjs"
+  },
   "scripts": {
     "start": "node packages/router/src/server.mjs",
     "console": "node apps/console/server.mjs",
@@ -13,8 +17,18 @@
     "lint": "node scripts/lint.mjs",
     "typecheck": "node --check packages/router/src/server.mjs && node --check apps/console/server.mjs && node --check cli/zerospend.mjs",
     "build": "node scripts/build.mjs",
-    "docs:build": "node scripts/build-docs.mjs",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs",
     "doctor": "node cli/zerospend.mjs doctor"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "vitepress": "1.6.4"
+  },
+  "overrides": {
+    "vitepress": {
+      "vite": "6.4.3"
+    }
+  }
 }
