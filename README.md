@@ -6,7 +6,9 @@
 
 [![CI](https://github.com/sjfakharian/zerospend/actions/workflows/ci.yml/badge.svg)](https://github.com/sjfakharian/zerospend/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE) [![Node 22+](https://img.shields.io/badge/node-22%2B-5FA04E)](package.json) [![macOS](https://img.shields.io/badge/platform-macOS-lightgrey)](docs/installation/macos.md) [![Release](https://img.shields.io/github/v/release/sjfakharian/zerospend)](https://github.com/sjfakharian/zerospend/releases)
 
-[![ZeroSpend synthetic routing demo](docs/public/overview.svg)](docs/dashboard.md)
+[![ZeroSpend synthetic verified-free fallback demo](docs/assets/zerospend-demo.gif)](docs/dashboard.md)
+
+*Deterministic synthetic demo: SQL classification, temporary HTTP 429 capacity, and fallback to another verified-free route. No live provider outage is claimed.*
 
 **Discover → Verify → Benchmark → Route → Observe**
 

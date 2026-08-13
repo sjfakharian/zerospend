@@ -1,0 +1,293 @@
+1
+00:00:00,000 --> 00:00:08,000
+A synthetic SQL request has reached a route
+with current evidence that it is free.
+
+2
+00:00:08,000 --> 00:00:16,000
+The route returns HTTP four twenty-nine. That means temporary
+capacity pressure, not permanent model invalidation.
+
+3
+00:00:16,000 --> 00:00:25,000
+ZeroSpend blocks the paid branch, tries another verified-free
+candidate, and completes the request without silent spend.
+
+4
+00:00:25,000 --> 00:00:34,000
+ZeroSpend is a local, OpenAI-compatible routing layer for
+workloads that must remain on currently verified-free routes.
+
+5
+00:00:34,000 --> 00:00:43,000
+Its central rule is simple: unknown cost is not free.
+When evidence is ambiguous, the route is ineligible.
+
+6
+00:00:43,000 --> 00:00:53,000
+We will begin from a clean temporary home, so the recording contains
+no personal paths, shell history, or existing configuration.
+
+7
+00:00:53,000 --> 00:01:03,000
+ZeroSpend currently requires macOS, Node.js twenty-two
+or later, npm, and Git for this source installation.
+
+8
+00:01:03,000 --> 00:01:13,000
+Clone the repository, enter the project directory, and point
+HOME and ZEROSPEND_HOME at an isolated temporary location.
+
+9
+00:01:13,000 --> 00:01:23,000
+Run the installer without sudo. It creates a user-owned
+launcher and keeps the router and console bound to loopback.
+
+10
+00:01:23,000 --> 00:01:33,000
+No provider credential is entered here. The clean installation remains
+recoverable even before interactive provider setup is complete.
+
+11
+00:01:33,000 --> 00:01:43,000
+The components command reports the runtime, the local router,
+the console, supported clients, and optional execution backends.
+
+12
+00:01:43,000 --> 00:01:54,000
+Hermes is the recommended client, but it is not required.
+Any compatible OpenAI client can call the same endpoint.
+
+13
+00:01:54,000 --> 00:02:05,000
+The router classifies each request deterministically, maps
+it to a task alias, and orders only eligible candidates.
+
+14
+00:02:05,000 --> 00:02:16,000
+Provider adapters execute requests, while the console reads operational
+metadata without storing prompts, completions, SQL, or tool payloads.
+
+15
+00:02:16,000 --> 00:02:27,000
+Provider setup is shared by the terminal and local console. Bearer
+credentials are entered with hidden input and stored locally.
+
+16
+00:02:27,000 --> 00:02:38,000
+OpenRouter is a direct OpenAI-compatible provider. Its free evidence
+requires explicit zero pricing and an eligible free model identifier.
+
+17
+00:02:38,000 --> 00:02:49,000
+NVIDIA NIM is also direct. A route needs current official
+Free Endpoint evidence before ZeroSpend can admit it.
+
+18
+00:02:49,000 --> 00:03:00,000
+OpenCode Free follows a different path: ZeroSpend calls
+local 9Router, which then executes the OpenCode Free request.
+
+19
+00:03:00,000 --> 00:03:13,000
+OpenCode Free needs no provider credential, but backend reachability,
+current catalog evidence, local mapping, and a bounded probe still matter.
+
+20
+00:03:13,000 --> 00:03:26,000
+OpenCode Zen is never substituted. All provider names, model
+names, counts, and availability states shown here are demo data.
+
+21
+00:03:26,000 --> 00:03:36,000
+A model appearing in a provider catalog is only the first gate.
+Listing alone says nothing definitive about production eligibility.
+
+22
+00:03:36,000 --> 00:03:46,000
+Next, ZeroSpend checks provider-specific cost evidence. Explicit
+zero cost may proceed; unknown or ambiguous cost is rejected.
+
+23
+00:03:46,000 --> 00:03:57,000
+The candidate must also support the request requirements, such
+as tools, structured output, context size, or task category.
+
+24
+00:03:57,000 --> 00:04:08,000
+A small bounded probe then checks current execution availability
+without creating a retry storm or consuming excessive free quota.
+
+25
+00:04:08,000 --> 00:04:19,000
+Only after those gates does ZeroSpend create a timestamped
+production-eligibility decision for that specific route.
+
+26
+00:04:19,000 --> 00:04:30,000
+The Models and Providers views expose the evidence source, probe
+result, current capacity state, and last verification time.
+
+27
+00:04:30,000 --> 00:04:40,000
+Before sending traffic, run the doctor command and inspect the strict-free
+counters. Paid routes and unverified routes should both be zero.
+
+28
+00:04:40,000 --> 00:04:50,000
+The router exposes one loopback OpenAI-compatible endpoint,
+while the console uses a separate loopback management boundary.
+
+29
+00:04:50,000 --> 00:05:00,000
+Unknown cost never becomes an emergency fallback. A capacity
+failure cannot silently widen the policy to a paid route.
+
+30
+00:05:00,000 --> 00:05:10,000
+The Safety view also confirms that content is excluded from
+telemetry and local services are not exposed by default.
+
+31
+00:05:10,000 --> 00:05:20,000
+Now send an explicitly synthetic streaming request to the
+local chat-completions endpoint. The local token stays hidden.
+
+32
+00:05:20,000 --> 00:05:30,000
+The request and generated answer are intentionally omitted from
+the recording. We only inspect routing headers and metadata.
+
+33
+00:05:30,000 --> 00:05:40,000
+The classifier recognizes the SQL task and selects the
+free-sql alias without making a second language-model call.
+
+34
+00:05:40,000 --> 00:05:50,000
+Candidate A is currently eligible because its cost evidence,
+capabilities, and bounded availability result all passed.
+
+35
+00:05:50,000 --> 00:06:00,000
+For this synthetic scenario, candidate A returns
+HTTP four twenty-nine after the request begins.
+
+36
+00:06:00,000 --> 00:06:10,000
+ZeroSpend records temporary capacity pressure. It does not erase
+the model evidence or mark the identifier permanently unsupported.
+
+37
+00:06:10,000 --> 00:06:20,000
+The policy evaluates the next branch. A paid or unverified
+route is not eligible, so that branch is explicitly blocked.
+
+38
+00:06:20,000 --> 00:06:31,000
+Candidate B has independent current free evidence. It receives
+the request and returns a synthetic HTTP two hundred response.
+
+39
+00:06:31,000 --> 00:06:35,000
+The console row updates with fallback depth one.
+
+40
+00:06:35,000 --> 00:06:48,000
+Live Routing shows the selected alias, provider and model,
+status, latency, token counts, attempts, and fallback depth.
+
+41
+00:06:48,000 --> 00:07:01,000
+The Routing view explains candidate order. Task score, recent
+reliability, and bounded benchmark evidence inform the ranking.
+
+42
+00:07:01,000 --> 00:07:14,000
+Models separates catalog membership, cost evidence, capability
+support, availability, and final production eligibility.
+
+43
+00:07:14,000 --> 00:07:27,000
+Providers separates configuration from catalog reachability and current
+capacity. A configured provider can still have zero eligible routes.
+
+44
+00:07:27,000 --> 00:07:40,000
+Benchmarks are small synthetic routing signals, not a universal model
+leaderboard. Failed evaluation does not overwrite a known-good ranking.
+
+45
+00:07:40,000 --> 00:07:53,000
+Usage records aggregate prompt and completion token counts by
+route, but never stores the underlying prompt or generated text.
+
+46
+00:07:53,000 --> 00:08:06,000
+Performance combines latency, time to first token, success history,
+errors, and recent rate-limit state without continuous background testing.
+
+47
+00:08:06,000 --> 00:08:18,000
+Safety keeps the invariant visible: zero paid production routes,
+zero unverified production routes, and loopback-only defaults.
+
+48
+00:08:18,000 --> 00:08:31,000
+Overview brings the same evidence together so an operator
+can audit why a route was selected and how fallback behaved.
+
+49
+00:08:31,000 --> 00:08:43,000
+Here is the complete path again. A compatible client
+sends one request to ZeroSpend on the local endpoint.
+
+50
+00:08:43,000 --> 00:08:56,000
+ZeroSpend owns classification, evidence policy, ordering, and metadata.
+Execution is direct, or passes through 9Router for OpenCode Free.
+
+51
+00:08:56,000 --> 00:09:10,000
+For Hermes, configure a custom OpenAI-compatible provider
+with the local base URL and the smart-free model name.
+
+52
+00:09:10,000 --> 00:09:24,000
+Hermes configuration syntax can change, so verify its current
+documentation. Other compatible SDKs use the same base URL and model.
+
+53
+00:09:24,000 --> 00:09:35,000
+Finally, suppose every currently verified-free candidate
+is unavailable. ZeroSpend does not attempt a paid route.
+
+54
+00:09:35,000 --> 00:09:46,000
+It returns HTTP five hundred and three with FREE_CAPACITY_UNAVAILABLE,
+zero paid attempts, and no immediate retry storm.
+
+55
+00:09:46,000 --> 00:09:58,000
+ZeroSpend cannot create free capacity, remove rate limits,
+or guarantee that provider pricing will remain unchanged.
+
+56
+00:09:58,000 --> 00:10:10,000
+Verified free means the implemented evidence rule passed
+at a recorded time. It is not a permanent promise.
+
+57
+00:10:10,000 --> 00:10:22,000
+Review provider terms, protect local credentials, and test model
+quality against your own workload and capability requirements.
+
+58
+00:10:22,000 --> 00:10:34,000
+To explore the project without credentials, clone the
+repository, enter the directory, and run npm run demo.
+
+59
+00:10:34,000 --> 00:10:47,000
+The source, setup guide, and deterministic demo are available
+at github dot com slash sjfakharian slash zerospend.
