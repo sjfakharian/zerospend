@@ -1,0 +1,22 @@
+WEBVTT
+
+00:00.000 --> 00:05.000
+A verified-free route hits a synthetic 429. Paid fallback is blocked, so ZeroSpend tries another verified-free route.
+
+00:05.000 --> 00:15.000
+ZeroSpend is a local router that admits routes only when current evidence says they are free.
+
+00:15.000 --> 00:32.000
+This synthetic SQL request moves through one continuous policy decision: classify, select Route A, record temporary capacity, block paid fallback, and select Route B.
+
+00:32.000 --> 00:46.000
+Free models change. Providers rate-limit. Catalog evidence can become stale or ambiguous, so discovery and verification are bounded and repeatable.
+
+00:46.000 --> 00:58.000
+Classification is deterministic. Code, SQL, reasoning, and tool requests map to aliases with ordered verified-free candidates.
+
+00:58.000 --> 01:24.000
+The local console shows provider evidence, route state, latency, token counts, benchmark signals, and fallback depth without storing prompt content.
+
+01:24.000 --> 01:34.000
+Try the synthetic demo locally with npm run demo. Provider availability changes over time.

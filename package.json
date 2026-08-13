@@ -20,6 +20,9 @@
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
+    "media:generate": "node scripts/generate-launch-media.mjs",
+    "media:walkthrough": "node scripts/generate-full-walkthrough.mjs",
+    "media:walkthrough:finish": "node scripts/finish-full-walkthrough.mjs",
     "doctor": "node cli/zerospend.mjs doctor"
   },
   "license": "MIT",
