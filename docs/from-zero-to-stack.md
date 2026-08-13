@@ -13,11 +13,35 @@ git clone https://github.com/sjfakharian/zerospend.git
 cd zerospend
 ./install.sh
 zerospend setup
+npm run console
 ```
 
 This creates `~/.zerospend/{config,secrets,data,logs,state,backups,runtime}` and a local client token without printing it.
 
-## Enter credentials safely
+Open `http://127.0.0.1:20131`, choose Providers, and add one OpenRouter or NVIDIA credential. Test the connection, run discovery, then run `zerospend doctor` and start the router. Keys are write-only and never returned to the browser after saving.
+
+The terminal provides the same shared provider manager:
+
+```bash
+zerospend provider add
+zerospend provider test openrouter
+zerospend provider status
+zerospend provider remove openrouter
+```
+
+Bearer credentials use hidden input and are never accepted as command arguments. `opencode-free` is a separate no-auth provider exposed through optional 9Router; it never creates `opencode.token` and does not substitute OpenCode Zen.
+
+`zerospend setup` detects macOS architecture, Node/npm, the user npm prefix, Hermes, 9Router, Router, Console, and optional OmniRoute. `zerospend components` repeats the component inventory without exposing configuration or credentials.
+
+Hermes is the recommended client, while any OpenAI-compatible client remains supported. The current official Hermes installer is shown for confirmation but is never executed silently. Prefer the official packaged macOS Desktop installer; source compilation is advanced.
+
+9Router is recommended only for OpenCode Free no-auth. Direct OpenRouter and NVIDIA do not depend on it. Current official 9Router documentation uses `npm install -g 9router`; persistent/background mode is `9router --tray --host 127.0.0.1 --port 20128`. `--no-browser` only suppresses browser launch and is not background mode. ZeroSpend first checks whether the active npm prefix is user-writable and never recommends `sudo npm`. Any user LaunchAgent must use the absolute executable path, explicit loopback host, explicit port, user-owned logs, and no secrets.
+
+OpenCode Free model membership is dynamic. Run `zerospend discover` and `zerospend models` to inspect the current timestamped, bounded-probe-verified inventory. ZeroSpend does not designate a permanent recommended test model. OpenCode Zen is a separate path and is never substituted as a free fallback.
+
+OpenRouter documents API-key creation at [OpenRouter API authentication](https://openrouter.ai/docs/api/reference/authentication). You need only one working provider for first success.
+
+## Advanced manual credential entry
 
 ```bash
 read -s "provider_key?Provider key: "
@@ -30,11 +54,11 @@ chmod 600 "$HOME/.zerospend/secrets/openrouter.token"
 
 Never paste keys into issues. Repeat with the documented filename for each enabled provider.
 
-## External components
+## Optional external components
 
-Install Hermes Agent, 9Router, and optional OmniRoute from their official distributions. ZeroSpend does not vendor them. Keep 9Router on loopback port `20128` and OmniRoute on `20130`; review current upstream licenses and instructions.
+ZeroSpend routes directly to providers by default. 9Router is an optional advanced gateway and OmniRoute is optional discovery/capacity infrastructure; neither is required. ZeroSpend does not vendor them.
 
-OpenRouter routes require explicit `:free` IDs and zero input/output prices. OpenCode needs current advertised-free evidence plus availability. NVIDIA needs the current `Free Endpoint` label, authenticated catalog membership, and a bounded chat probe.
+OpenRouter routes require explicit `:free` IDs and zero input/output prices. OpenCode is experimental/advanced: its official flow uses `/connect` with integration-specific API key, OAuth, or environment methods, so ZeroSpend does not invent a generic credential source. NVIDIA needs the current `Free Endpoint` label, authenticated catalog membership, and a bounded chat probe.
 
 ## Routing, discovery, and benchmarking
 

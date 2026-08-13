@@ -1,7 +1,7 @@
 # Troubleshooting
 
-- **npm EACCES:** configure a user-level npm prefix; do not use `sudo npm`.
-- **Homebrew permissions:** repair only the specific path Homebrew identifies; never recursively change all of `/usr/local`.
+- **npm EACCES:** do not use `sudo npm`. When a global install is truly required, use a user-owned prefix: `mkdir -p "$HOME/.local" && npm config set prefix "$HOME/.local"`, and add `$HOME/.local/bin` to `PATH`. ZeroSpend itself creates its launcher there and does not require global npm installation.
+- **Homebrew permissions:** inspect the exact directory Homebrew names (for example `/usr/local/lib/pkgconfig`) and its owner. If ownership is genuinely stale, repair only that path; never recursively change all of `/usr/local`. Hermes may work without optional `ripgrep`/`ffmpeg` features until those dependencies are repaired.
 - **Node/OpenSSL errors:** reinstall or relink the affected formula, then verify `node --version`.
 - **uv/PyPI timeout:** retry on a stable connection or increase the package-manager timeout; avoid disabling TLS.
 - **Playwright:** install the required browser with the official Playwright command.
@@ -10,3 +10,11 @@
 - **CORS/token mismatch:** verify the configured origin and local bearer token without printing it.
 - **Port collision:** identify the listener and change ZeroSpend’s configured port; never kill an unrelated process automatically.
 - **429/free quota exhausted:** wait for provider reset or use another independently verified-free fallback.
+- **`~/.local/bin` missing from PATH:** add `export PATH="$HOME/.local/bin:$PATH"` to your shell profile, then open a new terminal.
+- **9Router installed but offline:** run `9router --tray --host 127.0.0.1 --port 20128`, verify the listener is loopback-only, then use the reviewed user LaunchAgent template if persistence is needed. `--no-browser` does not background the process. Direct OpenRouter/NVIDIA routes remain available without it.
+- **OpenCode Free returns 406:** the selected model is stale. ZeroSpend marks it unavailable, performs at most one cooldown-bounded inventory refresh, and tries only another currently verified OpenCode Free model. If none remains it returns `FREE_CAPACITY_UNAVAILABLE`.
+- **OpenCode Free unavailable:** it is a no-auth 9Router backend, not OpenCode Zen. Start/configure 9Router; never create `opencode.token` for this route.
+- **9Router `/v1/models` is empty:** that aggregate is connection-driven and can omit no-auth OpenCode Free. ZeroSpend combines the current official OpenCode Free catalog with a required bounded probe through local 9Router; it never treats the public catalog alone as locally available capacity. The dashboard-only `/api/providers/suggested-models` route may require dashboard authentication.
+- **OpenCode Free probe says `local_backend_auth_required`:** OpenCode Free needs no provider credential, but 9Router's local API-key gate is enabled by default. If 9Router is verified loopback-only, open its Endpoint settings and disable **Require API Key**, then rerun provider test and discovery. ZeroSpend never changes this setting or reads 9Router's private keys automatically.
+- **OpenCode Free is temporarily rate-limited:** HTTP 429 means current free capacity is unavailable, not that the model mapping is invalid. ZeroSpend tries at most three distinct verified-free candidates, does not immediately retry the same model, preserves other providers' verified routes, and reports `TEMPORARY_CAPACITY`. Retry later; no paid or OpenCode Zen fallback is permitted.
+- **`discovery.lock` after interruption:** rerun `zerospend discover`. Locks owned by a definitely dead PID are recovered once; active locks remain protected. A malformed lock is recovered only after a conservative 24-hour expiry.

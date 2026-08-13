@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict><key>Label</key><string>com.zerospend.9router</string><key>ProgramArguments</key><array><string>__NINE_ROUTER__</string><string>--tray</string><string>--host</string><string>127.0.0.1</string><string>--port</string><string>20128</string></array><key>EnvironmentVariables</key><dict><key>PATH</key><string>__HOME__/.local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string></dict><key>RunAtLoad</key><true/><key>KeepAlive</key><true/><key>StandardOutPath</key><string>__HOME__/.zerospend/logs/9router.log</string><key>StandardErrorPath</key><string>__HOME__/.zerospend/logs/9router-error.log</string></dict></plist>

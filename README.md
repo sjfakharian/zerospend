@@ -4,7 +4,7 @@
 
 [![CI](https://github.com/sjfakharian/zerospend/actions/workflows/ci.yml/badge.svg)](https://github.com/sjfakharian/zerospend/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE) [![Node 22+](https://img.shields.io/badge/node-22%2B-5FA04E)](package.json) [![macOS](https://img.shields.io/badge/platform-macOS-lightgrey)](docs/installation/macos.md) [![Release](https://img.shields.io/github/v/release/sjfakharian/zerospend)](https://github.com/sjfakharian/zerospend/releases)
 
-![ZeroSpend Console synthetic demo](docs/assets/overview.png)
+[![ZeroSpend synthetic routing demo](docs/assets/routing-demo.svg)](docs/dashboard.md)
 
 ZeroSpend combines deterministic task routing, current zero-cost evidence, bounded model evaluation, runtime reliability feedback, provider fallback, and a metadata-only local console. It supports Hermes Agent, TypingMind, and generic OpenAI-compatible clients without logging prompts.
 
@@ -24,11 +24,11 @@ flowchart LR
   H[Hermes Agent] --> R[ZeroSpend Router :20129]
   T[TypingMind] --> R
   O[OpenAI-compatible client] --> R
-  R --> N[9Router :20128]
-  N --> OR[OpenRouter free]
-  N --> OC[OpenCode free]
+  R --> OR[OpenRouter free]
+  R --> OC[OpenCode free / advanced]
   R --> NV[NVIDIA Free Endpoint]
   R -. optional discovery .-> OM[OmniRoute :20130]
+  R -. optional gateway .-> N[9Router :20128]
   R -. metadata only .-> C[ZeroSpend Console :20131]
 ```
 
@@ -42,7 +42,16 @@ cd zerospend
 ./install.sh
 zerospend setup
 zerospend doctor
+npm run console
 ```
+
+Open `http://127.0.0.1:20131`, add one provider in Providers, test it, and run discovery. 9Router, OmniRoute, and OpenCode are not required for first success.
+
+Terminal-first users can run `zerospend provider add`, followed by `zerospend provider test openrouter` and `zerospend providers`. API keys are collected through hidden terminal input, never command arguments.
+
+Run `zerospend components` for a credential-free inventory of Router, Console, Hermes, 9Router, and optional OmniRoute. Hermes is the recommended client; 9Router is recommended only when enabling OpenCode Free no-auth.
+
+OpenCode Free candidates are discovered dynamically from provider-specific 9Router metadata and bounded probes. No changing external model ID is hardcoded as authoritative, and OpenCode Zen is never a fallback.
 
 Try the console without API keys:
 
@@ -89,6 +98,8 @@ Start with the [Quickstart](docs/quickstart.md), [Architecture](docs/architectur
 ## Honest limitations
 
 Free tiers and provider terms change. Rate limits and capacity are outside ZeroSpend’s control. Benchmarks consume quota. macOS is the primary supported platform; Linux service installation is experimental. Users remain responsible for provider terms. ZeroSpend is not intended to bypass restrictions.
+
+Discovery requires provider credentials and network access. OpenCode eligibility depends on machine-readable official free-offer evidence; ambiguous offers stay excluded. NVIDIA catalog evidence may change independently of model availability. Automatic promotion is conservative, but synthetic scores are not a substitute for evaluating your own workload.
 
 ## Contributing and roadmap
 
