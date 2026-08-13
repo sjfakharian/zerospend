@@ -1,12 +1,18 @@
+<p align="center"><img src="docs/public/logo.svg" width="88" alt="ZeroSpend logo"></p>
+
 # ZeroSpend
 
-**One local OpenAI-compatible endpoint that discovers, verifies, benchmarks, and routes to the best currently free model for each task.**
+**ZeroSpend discovers, verifies, ranks, and routes LLM requests only across currently verified-free capacity—with no silent paid fallback.**
 
 [![CI](https://github.com/sjfakharian/zerospend/actions/workflows/ci.yml/badge.svg)](https://github.com/sjfakharian/zerospend/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE) [![Node 22+](https://img.shields.io/badge/node-22%2B-5FA04E)](package.json) [![macOS](https://img.shields.io/badge/platform-macOS-lightgrey)](docs/installation/macos.md) [![Release](https://img.shields.io/github/v/release/sjfakharian/zerospend)](https://github.com/sjfakharian/zerospend/releases)
 
 [![ZeroSpend synthetic routing demo](docs/public/overview.svg)](docs/dashboard.md)
 
-ZeroSpend combines deterministic task routing, current zero-cost evidence, bounded model evaluation, runtime reliability feedback, provider fallback, and a metadata-only local console. It supports Hermes Agent, TypingMind, and generic OpenAI-compatible clients without logging prompts.
+**Discover → Verify → Benchmark → Route → Observe**
+
+`UNKNOWN COST = NOT FREE`
+
+ZeroSpend exposes one local OpenAI-compatible endpoint for Hermes, TypingMind, and other compatible clients. It classifies requests deterministically, admits only routes with current zero-cost evidence, and records operational metadata without storing prompt content.
 
 ## Why ZeroSpend?
 
@@ -21,18 +27,16 @@ ZeroSpend combines deterministic task routing, current zero-cost evidence, bound
 
 ```mermaid
 flowchart LR
-  H[Hermes Agent] --> R[ZeroSpend Router :20129]
-  T[TypingMind] --> R
-  O[OpenAI-compatible client] --> R
-  R --> OR[OpenRouter free]
-  R --> OC[OpenCode free / advanced]
-  R --> NV[NVIDIA Free Endpoint]
-  R -. optional discovery .-> OM[OmniRoute :20130]
-  R -. optional gateway .-> N[9Router :20128]
-  R -. metadata only .-> C[ZeroSpend Console :20131]
+  H[Hermes / OpenAI-compatible client] --> R[ZeroSpend :20129]
+  R --> P[Task classification<br/>verified-free policy<br/>ranking and fallback]
+  P --> OR[OpenRouter]
+  P --> NV[NVIDIA NIM]
+  P --> N[9Router]
+  N --> OC[OpenCode Free]
+  R -. metadata only .-> C[Console :20131]
 ```
 
-All services bind to `127.0.0.1` by default.
+ZeroSpend owns discovery, cost verification, policy, task ranking, fallback, and observability. 9Router is an optional transport/provider gateway for OpenCode Free; direct providers do not require it. All services bind to `127.0.0.1` by default.
 
 ## Quick start
 
@@ -60,7 +64,7 @@ npm run demo
 # http://127.0.0.1:20131
 ```
 
-The polished local console includes Overview, Live Routing, Models, Routing, Benchmarks, Usage, Providers, Safety, Automation, and Settings. Its bundled demo is explicitly synthetic; live mode reads only local operational metadata.
+The polished local console includes Overview, Live Routing, Models, Routing, Benchmarks, Usage, Performance, Providers, Safety, Automation, and Settings. Its bundled demo is explicitly synthetic; live mode reads only local operational metadata.
 
 ## How routing works
 
