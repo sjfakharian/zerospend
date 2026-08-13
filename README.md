@@ -10,6 +10,8 @@
 
 *Deterministic synthetic demo: SQL classification, temporary HTTP 429 capacity, and fallback to another verified-free route. No live provider outage is claimed.*
 
+[Watch the full ZeroSpend walkthrough](https://youtu.be/OfNsOJGxjEQ): from clean installation to the first verified-free routed request.
+
 **Discover → Verify → Benchmark → Route → Observe**
 
 `UNKNOWN COST = NOT FREE`
