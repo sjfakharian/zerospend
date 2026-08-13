@@ -6,24 +6,20 @@ It reads only ZeroSpend state files and the metadata event store. Prompt text, c
 
 The screenshots below contain synthetic demo data only.
 
-## Overview and live routing
+## Overview
 
-![Synthetic Overview view](screenshots/overview.jpg)
+The main Console view keeps strict-free health, aggregate metadata, and recent routing outcomes in one complete frame.
 
-![Synthetic Live Routing view](screenshots/live-routing.jpg)
+![Complete synthetic Overview view](screenshots/overview.png)
 
-## Models and benchmarks
+## Verified-free models
 
-![Synthetic Models view](screenshots/models.jpg)
+This view shows every current demo route with its provider, zero-cost evidence, production eligibility, alias rank, context, tool support, reliability, and latency.
 
-![Synthetic Benchmarks view](screenshots/benchmarks.jpg)
+![Complete synthetic Models view](screenshots/models.png)
 
-## Providers and safety
+## Routing outcome
 
-![Synthetic Providers view](screenshots/providers.jpg)
+The performance view captures one complete synthetic exhausted-capacity event: HTTP 503, temporary HTTP 429 state, fallback depth, and `temporary_free_capacity_unavailable`—without exposing prompt content.
 
-![Synthetic Safety view](screenshots/safety.jpg)
-
-## Responsive layout
-
-![Synthetic mobile Overview view](screenshots/mobile-overview.jpg)
+![Complete synthetic failure and fallback outcome](screenshots/routing-outcome.png)

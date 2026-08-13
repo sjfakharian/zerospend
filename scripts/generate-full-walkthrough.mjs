@@ -9,7 +9,7 @@ const command=(program,args)=>new Promise((resolve,reject)=>{const child=spawn(p
 const run=args=>command(ffmpeg,['-hide_banner','-loglevel','error','-y',...args]);
 const esc=value=>String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');
 const img=async file=>`data:image/jpeg;base64,${(await readFile(file)).toString('base64')}`;
-const shots={overview:await img('docs/screenshots/overview.jpg'),live:await img('docs/screenshots/live-routing.jpg'),models:await img('docs/screenshots/models.jpg'),routing:await img('docs/screenshots/overview.jpg'),benchmarks:await img('docs/screenshots/benchmarks.jpg'),usage:await img('docs/screenshots/overview.jpg'),providers:await img('docs/screenshots/providers.jpg'),safety:await img('docs/screenshots/safety.jpg')};
+const shots={overview:await img('docs/screenshots/overview.png'),live:await img('docs/screenshots/routing-outcome.png'),models:await img('docs/screenshots/models.png'),routing:await img('docs/screenshots/overview.png'),benchmarks:await img('docs/screenshots/models.png'),usage:await img('docs/screenshots/overview.png'),providers:await img('docs/screenshots/models.png'),safety:await img('docs/screenshots/overview.png')};
 
 const p={bg:'#080b12',panel:'#121722',panel2:'#171d2a',line:'#30394d',text:'#f3f5fa',muted:'#a4aec2',violet:'#887dff',green:'#49df8d',amber:'#f2b45d',red:'#ff7b8c',blue:'#63b8ff'};
 const defs=`<defs><radialGradient id="bg" cx="75%" cy="0%" r="88%"><stop stop-color="#292266"/><stop offset=".43" stop-color="#111521"/><stop offset="1" stop-color="#080a10"/></radialGradient><linearGradient id="logo"><stop stop-color="#a096ff"/><stop offset="1" stop-color="#49df8d"/></linearGradient></defs>`;
