@@ -4,7 +4,7 @@ export default defineConfig({
   title:'ZeroSpend',
   description:'A verified-free, task-aware local LLM routing stack.',
   base:'/zerospend/',
-  outDir:'../../dist/docs',
+  outDir:'../dist/docs',
   cleanUrls:true,
   lastUpdated:true,
   appearance:true,
