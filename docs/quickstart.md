@@ -27,3 +27,12 @@ OpenRouter, NVIDIA NIM, and TokenHarbor are direct providers. TokenHarbor eligib
 `--dry-run` writes recommendations but never changes production routing. Review generated LaunchAgents before loading them. The credential-free synthetic console is available with `npm run demo` at `http://127.0.0.1:20131` and contacts no provider.
 
 Bearer credentials are entered with terminal echo disabled and stored by the same provider manager used by the Console. Manual `.token` file creation is an advanced recovery/configuration option only.
+
+For occupied default ports, use explicit alternatives consistently:
+
+```bash
+ZEROSPEND_ROUTER_PORT=20229 ZEROSPEND_CONSOLE_PORT=20231 ./install.sh
+ZEROSPEND_ROUTER_PORT=20229 ZEROSPEND_CONSOLE_PORT=20231 zerospend doctor
+```
+
+Point Hermes or another compatible client to `http://127.0.0.1:20229/v1` in this example.

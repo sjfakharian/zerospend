@@ -1,11 +1,20 @@
 # Changelog
 
-## [Unreleased]
+## [0.3.0] - 2026-08-27
 
 ### Added
 
 - Direct TokenHarbor provider support with fail-closed `:free` and zero-price catalog verification.
 - TokenHarbor live-catalog pricing normalization for `*_usd_per_1m` fields.
+
+### Fixed
+
+- Setup, doctor, component inventory, and dashboard output now honor custom router and Console ports instead of reporting hardcoded defaults.
+- Project version metadata is synchronized across `VERSION`, `package.json`, `package-lock.json`, and `PROJECT.yaml`.
+
+### Changed
+
+- GitHub Actions use the current checkout, Node setup, CodeQL, and Pages deployment majors.
 
 ## [0.2.0] - 2026-08-12
 

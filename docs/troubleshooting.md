@@ -1,5 +1,7 @@
 # Troubleshooting
 
+- **Default port already occupied:** identify the listener without exposing command-line secrets, leave unrelated services running, and choose explicit `ZEROSPEND_ROUTER_PORT` and `ZEROSPEND_CONSOLE_PORT` values. Reuse those values for setup, doctor, LaunchAgents, and client endpoints; current summaries honor the overrides.
+
 - **npm EACCES:** do not use `sudo npm`. When a global install is truly required, use a user-owned prefix: `mkdir -p "$HOME/.local" && npm config set prefix "$HOME/.local"`, and add `$HOME/.local/bin` to `PATH`. ZeroSpend itself creates its launcher there and does not require global npm installation.
 - **Homebrew permissions:** inspect the exact directory Homebrew names (for example `/usr/local/lib/pkgconfig`) and its owner. If ownership is genuinely stale, repair only that path; never recursively change all of `/usr/local`. Hermes may work without optional `ripgrep`/`ffmpeg` features until those dependencies are repaired.
 - **Node/OpenSSL errors:** reinstall or relink the affected formula, then verify `node --version`.
