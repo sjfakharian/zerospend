@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- Direct TokenHarbor provider support with fail-closed `:free` and zero-price catalog verification.
+
 ## [0.2.0] - 2026-08-12
 
 ### Added
