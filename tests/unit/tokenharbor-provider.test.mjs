@@ -14,5 +14,6 @@ test('TokenHarbor admits only explicit free IDs with zero catalog pricing',async
 
 test('TokenHarbor pricing normalization remains fail-closed for unknown schemas',()=>{
   assert.deepEqual(tokenHarborPricing({pricing:{input_per_million:'0',output_per_million:'0'}}),{input:'0',output:'0'});
+  assert.deepEqual(tokenHarborPricing({pricing:{input_usd_per_1m:0,output_usd_per_1m:0}}),{input:0,output:0});
   assert.deepEqual(tokenHarborPricing({pricing:{unknown:0}}),{input:undefined,output:undefined});
 });

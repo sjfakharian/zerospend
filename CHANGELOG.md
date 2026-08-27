@@ -5,6 +5,7 @@
 ### Added
 
 - Direct TokenHarbor provider support with fail-closed `:free` and zero-price catalog verification.
+- TokenHarbor live-catalog pricing normalization for `*_usd_per_1m` fields.
 
 ## [0.2.0] - 2026-08-12
 
