@@ -37,5 +37,5 @@ This ledger was checked against the `docs/launch-media` source tree and its synt
 - “Zero cost forever,” unlimited capacity, guaranteed uptime, or guaranteed model quality.
 - Production adoption, user count, request volume, savings, stars, or comparative benchmark leadership.
 - Automatic real-time provider discovery on every request. Discovery and benchmark jobs are scheduled/manual and bounded.
-- Endorsement by OpenRouter, NVIDIA, TokenHarbor, OpenCode, 9Router, OmniRoute, Hermes, or TypingMind.
+- Endorsement by OpenRouter, NVIDIA, TokenHarbor, APINex, OpenCode, 9Router, OmniRoute, Hermes, or TypingMind.
 - That the console stores no data. It stores metadata, but not prompt/completion/SQL/tool payload content.

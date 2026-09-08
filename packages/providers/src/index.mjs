@@ -1,2 +1,3 @@
 export {ProviderAdapter} from './base.mjs';export {OpenAICompatibleProvider} from './openai-compatible.mjs';export {OpenRouterProvider} from './openrouter.mjs';export {OpenCodeProvider} from './opencode.mjs';export {OpenCodeFreeProvider,isCurrentOpenCodeFree,openCodeFreeEvidence,parseRetryAfter,toNineRouterModelId} from './opencode-free.mjs';export {NvidiaProvider} from './nvidia.mjs';
 export {TokenHarborProvider,tokenHarborPricing} from './tokenharbor.mjs';
+export {ApiNexProvider,apiNexPricing,hasExplicitApiNexFreeEvidence} from './apinex.mjs';

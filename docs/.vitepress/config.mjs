@@ -29,7 +29,7 @@ export default defineConfig({
     sidebar:[
       {text:'Start',items:[{text:'Overview',link:'/'},{text:'Quickstart',link:'/quickstart'},{text:'Install on macOS',link:'/installation/macos'},{text:'Linux (experimental)',link:'/installation/linux-experimental'},{text:'From zero to stack',link:'/from-zero-to-stack'}]},
       {text:'Core concepts',items:[{text:'Architecture',link:'/architecture'},{text:'Routing',link:'/routing'},{text:'Free verification',link:'/free-verification'},{text:'Benchmarking',link:'/benchmarking'},{text:'Observability',link:'/observability'}]},
-      {text:'Providers',items:[{text:'OpenRouter',link:'/providers/openrouter'},{text:'OpenCode Free',link:'/providers/opencode'},{text:'NVIDIA NIM',link:'/providers/nvidia'},{text:'TokenHarbor',link:'/providers/tokenharbor'},{text:'OmniRoute',link:'/providers/omniroute'}]},
+      {text:'Providers',items:[{text:'OpenRouter',link:'/providers/openrouter'},{text:'OpenCode Free',link:'/providers/opencode'},{text:'NVIDIA NIM',link:'/providers/nvidia'},{text:'TokenHarbor',link:'/providers/tokenharbor'},{text:'APINex',link:'/providers/apinex'},{text:'OmniRoute',link:'/providers/omniroute'}]},
       {text:'Integrations',items:[{text:'Hermes Agent',link:'/integrations/hermes'},{text:'TypingMind',link:'/integrations/typingmind'},{text:'OpenAI-compatible',link:'/integrations/openai-compatible'}]},
       {text:'Operate',items:[{text:'Console',link:'/dashboard'},{text:'Configuration',link:'/configuration'},{text:'Privacy',link:'/privacy'},{text:'Security',link:'/security'},{text:'Troubleshooting',link:'/troubleshooting'}]},
       {text:'Project',items:[{text:'FAQ',link:'/faq'},{text:'Contributing',link:'/contributing'},{text:'Clean-machine validation',link:'/clean-machine-validation'}]}

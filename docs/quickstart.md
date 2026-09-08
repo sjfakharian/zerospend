@@ -22,7 +22,7 @@ zerospend benchmark
 zerospend automation install
 ```
 
-OpenRouter, NVIDIA NIM, and TokenHarbor are direct providers. TokenHarbor eligibility requires an explicit `:free` model ID and explicit zero input/output pricing; review its free-route data-retention opt-in before use.
+OpenRouter, NVIDIA NIM, TokenHarbor, and APINex are direct providers. TokenHarbor eligibility requires an explicit `:free` model ID and explicit zero input/output pricing; review its free-route data-retention opt-in before use. APINex eligibility requires an explicit free marker plus explicit zero input/output catalog pricing; paid or ambiguously priced models are never admitted.
 
 `--dry-run` writes recommendations but never changes production routing. Review generated LaunchAgents before loading them. The credential-free synthetic console is available with `npm run demo` at `http://127.0.0.1:20131` and contacts no provider.
 
