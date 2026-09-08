@@ -18,7 +18,7 @@ npm run console
 
 This creates `~/.zerospend/{config,secrets,data,logs,state,backups,runtime}` and a local client token without printing it.
 
-Open `http://127.0.0.1:20131`, choose Providers, and add one OpenRouter, NVIDIA, or TokenHarbor credential. Test the connection, run discovery, then run `zerospend doctor` and start the router. Keys are write-only and never returned to the browser after saving.
+Open `http://127.0.0.1:20131`, choose Providers, and add one OpenRouter, NVIDIA, TokenHarbor, or APINex credential. Test the connection, run discovery, then run `zerospend doctor` and start the router. Keys are write-only and never returned to the browser after saving.
 
 The terminal provides the same shared provider manager:
 
@@ -35,7 +35,7 @@ Bearer credentials use hidden input and are never accepted as command arguments.
 
 Hermes is the recommended client, while any OpenAI-compatible client remains supported. The current official Hermes installer is shown for confirmation but is never executed silently. Prefer the official packaged macOS Desktop installer; source compilation is advanced.
 
-9Router is recommended only for OpenCode Free no-auth. Direct OpenRouter, NVIDIA, and TokenHarbor routes do not depend on it. Current official 9Router documentation uses `npm install -g 9router`; persistent/background mode is `9router --tray --host 127.0.0.1 --port 20128`. `--no-browser` only suppresses browser launch and is not background mode. ZeroSpend first checks whether the active npm prefix is user-writable and never recommends `sudo npm`. Any user LaunchAgent must use the absolute executable path, explicit loopback host, explicit port, user-owned logs, and no secrets.
+9Router is recommended only for OpenCode Free no-auth. Direct OpenRouter, NVIDIA, TokenHarbor, and APINex routes do not depend on it. Current official 9Router documentation uses `npm install -g 9router`; persistent/background mode is `9router --tray --host 127.0.0.1 --port 20128`. `--no-browser` only suppresses browser launch and is not background mode. ZeroSpend first checks whether the active npm prefix is user-writable and never recommends `sudo npm`. Any user LaunchAgent must use the absolute executable path, explicit loopback host, explicit port, user-owned logs, and no secrets.
 
 OpenCode Free model membership is dynamic. Run `zerospend discover` and `zerospend models` to inspect the current timestamped, bounded-probe-verified inventory. ZeroSpend does not designate a permanent recommended test model. OpenCode Zen is a separate path and is never substituted as a free fallback.
 
@@ -56,7 +56,7 @@ Never paste keys into issues. Repeat with the documented filename for each enabl
 
 ## Optional external components
 
-ZeroSpend routes directly to OpenRouter, NVIDIA, and TokenHarbor by default. 9Router is an optional advanced gateway and OmniRoute is optional discovery/capacity infrastructure; neither is required. ZeroSpend does not vendor them.
+ZeroSpend routes directly to OpenRouter, NVIDIA, TokenHarbor, and APINex by default. 9Router is an optional advanced gateway and OmniRoute is optional discovery/capacity infrastructure; neither is required. ZeroSpend does not vendor them.
 
 OpenRouter routes require explicit `:free` IDs and zero input/output prices. TokenHarbor uses the same fail-closed shape: explicit `:free` plus zero catalog pricing, followed by a bounded probe; paid base IDs and `th-orchestra` are excluded. OpenCode is experimental/advanced: its official flow uses `/connect` with integration-specific API key, OAuth, or environment methods, so ZeroSpend does not invent a generic credential source. NVIDIA needs the current `Free Endpoint` label, authenticated catalog membership, and a bounded chat probe.
 

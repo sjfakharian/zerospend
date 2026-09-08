@@ -36,12 +36,13 @@ flowchart LR
   P --> OR[OpenRouter]
   P --> NV[NVIDIA NIM]
   P --> TH[TokenHarbor]
+  P --> AX[APINex]
   P --> N[9Router]
   N --> OC[OpenCode Free]
   R -. metadata only .-> C[Console :20131]
 ```
 
-ZeroSpend owns discovery, cost verification, policy, task ranking, fallback, and observability. 9Router is an optional transport/provider gateway for OpenCode Free; direct OpenRouter, NVIDIA, and TokenHarbor routes do not require it. All services bind to `127.0.0.1` by default.
+ZeroSpend owns discovery, cost verification, policy, task ranking, fallback, and observability. 9Router is an optional transport/provider gateway for OpenCode Free; direct OpenRouter, NVIDIA, TokenHarbor, and APINex routes do not require it. All services bind to `127.0.0.1` by default.
 
 ## Quick start
 
@@ -87,6 +88,7 @@ Each alias is an ordered verified-free fallback chain. A route is attempted only
 | OpenCode | Production when verified | Current advertised-free evidence plus live availability |
 | NVIDIA API Catalog | Direct production | Current `Free Endpoint` evidence, authenticated catalog presence, bounded probe |
 | TokenHarbor | Direct production when verified | Explicit `:free` ID, zero input/output catalog pricing, bounded probe |
+| APINex | Direct production when verified | Explicit free marker, zero input/output catalog pricing, bounded probe |
 | OmniRoute | Optional discovery/capacity | Only independently verified, useful, non-duplicate free routes |
 
 ## Integrations
@@ -113,7 +115,7 @@ Start with the [Quickstart](docs/quickstart.md), [Architecture](docs/architectur
 
 Free tiers and provider terms change. Rate limits and capacity are outside ZeroSpend’s control. Benchmarks consume quota. macOS is the primary supported platform; Linux service installation is experimental. Users remain responsible for provider terms. ZeroSpend is not intended to bypass restrictions.
 
-Discovery requires provider credentials and network access. OpenCode eligibility depends on machine-readable official free-offer evidence; ambiguous offers stay excluded. NVIDIA and TokenHarbor catalog evidence may change independently of model availability. TokenHarbor permanent free routes require an account opt-in and may retain prompts and responses under the provider's current terms. Automatic promotion is conservative, but synthetic scores are not a substitute for evaluating your own workload.
+Discovery requires provider credentials and network access. OpenCode eligibility depends on machine-readable official free-offer evidence; ambiguous offers stay excluded. NVIDIA, TokenHarbor, and APINex catalog evidence may change independently of model availability. APINex advertises both free and paid models; paid, promotional-credit-only, or ambiguously priced entries remain ineligible. TokenHarbor permanent free routes require an account opt-in and may retain prompts and responses under the provider's current terms. Automatic promotion is conservative, but synthetic scores are not a substitute for evaluating your own workload.
 
 ## Contributing and roadmap
 
@@ -121,7 +123,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) and [ROADMAP.md](ROADMAP.md). Security re
 
 ## Acknowledgements
 
-ZeroSpend orchestrates external systems; it does not claim authorship of Hermes Agent, 9Router, OmniRoute, OpenRouter, NVIDIA NIM, TokenHarbor, OpenCode, or TypingMind. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+ZeroSpend orchestrates external systems; it does not claim authorship of Hermes Agent, 9Router, OmniRoute, OpenRouter, NVIDIA NIM, TokenHarbor, APINex, OpenCode, or TypingMind. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 ## License
 

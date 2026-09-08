@@ -1,5 +1,15 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- Direct APINex provider support with hidden credential entry, fail-closed free/zero-price evidence, and bounded availability verification.
+
+### Fixed
+
+- Integration-test service startup checks now retain a bounded five-second budget under parallel load.
+
 ## [0.3.0] - 2026-08-27
 
 ### Added
