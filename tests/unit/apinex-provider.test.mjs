@@ -19,3 +19,23 @@ test('APINex pricing and free evidence remain fail-closed for unknown catalog sh
   assert.equal(hasExplicitApiNexFreeEvidence({id:'not-freeish'}),false);
   assert.equal(hasExplicitApiNexFreeEvidence({id:'model',tier:'free'}),true);
 });
+
+test('APINex freeEvidence extracts allowFree models and verifyFree admits them',async()=>{
+  const mockCatalog=[
+    {id:'free/deepseek-v4.1-flash',provider:'Free',allowFree:true},
+    {id:'free/glm-5.3-flash',provider:'Free',allowFree:true},
+    {id:'free/claude-opus-4.6',provider:'Free',allowFree:false},
+    {id:'paid-model',provider:'Anthropic',allowFree:false}
+  ];
+  const custom=new ApiNexProvider({
+    fetchImpl:async()=>new Response(JSON.stringify(mockCatalog),{status:200})
+  });
+  const evidence=await custom.freeEvidence();
+  assert.equal(evidence.has('free/deepseek-v4.1-flash'),true);
+  assert.equal(evidence.has('free/glm-5.3-flash'),true);
+  assert.equal(evidence.has('free/claude-opus-4.6'),false);
+  assert.equal(evidence.has('paid-model'),false);
+
+  assert.equal(await custom.verifyFree({id:'free/deepseek-v4.1-flash'},evidence),true);
+  assert.equal(await custom.verifyFree({id:'free/claude-opus-4.6'},evidence),false);
+});

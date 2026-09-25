@@ -18,9 +18,74 @@ export function hasExplicitApiNexFreeEvidence(model={}){
 }
 
 export class ApiNexProvider extends OpenAICompatibleProvider{
-  constructor(options={}){super({baseUrl:'https://api.apinex.bond/v1',...options})}
-  async verifyFree(model){
+  constructor(options={}){
+    super({
+      baseUrl:'https://api.apinex.bond/v1',
+      catalogUrl:'https://apinex.bond/api/public/models',
+      ...options
+    });
+  }
+
+  async freeEvidence(){
+    try{
+      const r=await this.fetch(this.options.catalogUrl,{signal:AbortSignal.timeout(30000)});
+      if(!r.ok)return new Set();
+      const data=await r.json();
+      const models=Array.isArray(data)?data:data.models||[];
+      const ids=new Set();
+      for(const m of models){
+        if(m?.allowFree===true&&(m.provider==='Free'||String(m.id||'').startsWith('free/'))){
+          ids.add(m.id);
+        }
+      }
+      return ids;
+    }catch{
+      return new Set();
+    }
+  }
+
+  async verifyFree(model,evidence){
     const pricing=apiNexPricing(model);
-    return hasExplicitApiNexFreeEvidence(model)&&numericZero(pricing.input)&&numericZero(pricing.output);
+    const hasZeroPricing=numericZero(pricing.input)&&numericZero(pricing.output);
+    const explicitFree=hasExplicitApiNexFreeEvidence(model);
+
+    if(evidence instanceof Set){
+      return evidence.has(model?.id)||(explicitFree&&hasZeroPricing);
+    }
+    if(evidence?.ids instanceof Set){
+      return evidence.ids.has(model?.id)||(explicitFree&&hasZeroPricing);
+    }
+
+    return explicitFree&&hasZeroPricing;
+  }
+
+  async healthCheck(model){
+    const started=Date.now();
+    try{
+      let r=await this.fetch(`${this.options.baseUrl}/chat/completions`,{
+        method:'POST',
+        headers:this.headers(),
+        body:JSON.stringify({model,messages:[{role:'user',content:'Reply OK'}],max_tokens:8}),
+        signal:AbortSignal.timeout(15000)
+      });
+      if(r.status===429){
+        await new Promise(resolve=>setTimeout(resolve,3000));
+        r=await this.fetch(`${this.options.baseUrl}/chat/completions`,{
+          method:'POST',
+          headers:this.headers(),
+          body:JSON.stringify({model,messages:[{role:'user',content:'Reply OK'}],max_tokens:8}),
+          signal:AbortSignal.timeout(15000)
+        });
+      }
+      await r.body?.cancel();
+      return {
+        available:r.ok,
+        status:r.status,
+        error_class:r.status===429?'local_rate_limited':undefined,
+        latency_ms:Date.now()-started
+      };
+    }catch(e){
+      return {available:false,status:null,error:e.name,latency_ms:Date.now()-started};
+    }
   }
 }

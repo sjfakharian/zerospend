@@ -14,10 +14,11 @@ export function orderRoutes(routes,stats={},options={}){
     const benchA=Number(benchmarkScores[a]||0),benchB=Number(benchmarkScores[b]||0);
     const tier=r=>{
       const s=String(r||'').toLowerCase();
-      if(s.includes('ultra')||s.includes('550b')||s.includes('340b'))return 30;
+      if(s.includes('ultra')||s.includes('550b')||s.includes('340b')||s.includes('gpt-6')||s.includes('deepseek-v4-pro'))return 35;
+      if(s.includes('super')||s.includes('120b')||s.includes('deepseek-v4.1')||s.includes('deepseek-v4')||s.includes('mimo-v2.6-pro'))return 25;
       if(s.includes('lightning')||s.includes('70b')||s.includes('pro')||s.includes('coder')||s.includes('kimi'))return 20;
-      if(s.includes('flash')||s.includes('30b')||s.includes('27b'))return 10;
-      if(s.includes('2.6b')||s.includes('2b')||s.includes('mini'))return category==='fast'?15:-10;
+      if(s.includes('flash')||s.includes('30b')||s.includes('27b')||s.includes('qwen')||s.includes('glm'))return 12;
+      if(s.includes('2.6b')||s.includes('2b')||s.includes('mini')||s.includes('note-preview'))return category==='fast'?15:-10;
       return 0;
     };
     return (statScore(sb)+benchB+tier(b))-(statScore(sa)+benchA+tier(a));

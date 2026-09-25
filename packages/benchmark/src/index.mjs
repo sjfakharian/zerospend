@@ -1,5 +1,5 @@
 import path from 'node:path';
-import {copyFile,mkdir} from 'node:fs/promises';
+import {copyFile,mkdir,readFile} from 'node:fs/promises';
 import {paths} from '../../shared/src/paths.mjs';
 import {atomicJson,readJson,withLock} from '../../shared/src/files.mjs';
 
@@ -42,6 +42,7 @@ export function grade(category,json){
     return {correctness:hasToolCall?1:0,instruction:1,tools:hasToolCall?1:0};
   }
   let content=(msg.content||'').trim();
+  content=content.replace(/<think>[\s\S]*?<\/think>/gi,'').trim();
   if(content.startsWith('```')){
     content=content.replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/,'').trim();
   }
@@ -61,16 +62,47 @@ export function grade(category,json){
 }
 
 export async function runBenchmark(options={}){
-  const p=options.paths||paths(),dryRun=options.dryRun??false,caller=options.call;
+  const p=options.paths||paths(),dryRun=options.dryRun??false;
+  const defaultCaller=async(route,test)=>{
+    const key=route.secret_file?(await readFile(path.join(p.secrets,route.secret_file),'utf8')).trim():'';
+    const started=Date.now();
+    const base=(route.base_url||'').replace(/\/$/,'');
+    const response=await fetch(`${base}/chat/completions`,{
+      method:'POST',
+      headers:{...(key?{authorization:`Bearer ${key}`}:{}),'content-type':'application/json'},
+      body:JSON.stringify({
+        model:route.model_id,
+        messages:[{role:'user',content:test.prompt}],
+        ...(test.tools?{tools:test.tools,tool_choice:test.tool_choice}:{}),
+        max_tokens:180,
+        temperature:0
+      }),
+      signal:AbortSignal.timeout(20000)
+    });
+    let json={};
+    try{json=await response.json()}catch{};
+    return {status:response.status,latency_ms:Date.now()-started,json};
+  };
+  const caller=options.call||defaultCaller;
   return withLock(path.join(p.runtime,'benchmark.lock'),async()=>{
     const inventory=options.inventory||await readJson(path.join(p.state,'verified-routes.json'),{routes:{}}),
           config=options.config||await readJson(path.join(p.config,'routing.json')),
           runtime=options.runtime||await readJson(path.join(p.state,'runtime-stats.json'),{models:{}}),
-          routes=Object.values(inventory.routes||{}).filter(r=>r.zero_cost&&r.available&&r.production_eligible).slice(0,Number(options.maxCandidates||8));
+          candidatePool=Object.values(inventory.routes||{}).filter(r=>r.zero_cost&&r.available&&r.production_eligible);
+    const tier=r=>{
+      const s=String(r?.route||r?.model_id||'').toLowerCase();
+      if(s.includes('ultra')||s.includes('550b')||s.includes('340b')||s.includes('gpt-6')||s.includes('deepseek-v4-pro'))return 40;
+      if(s.includes('super')||s.includes('120b')||s.includes('deepseek-v4.1')||s.includes('deepseek-v4')||s.includes('mimo-v2.6-pro'))return 30;
+      if(s.includes('lightning')||s.includes('70b')||s.includes('coder')||s.includes('kimi'))return 20;
+      if(s.includes('flash')||s.includes('30b')||s.includes('qwen')||s.includes('glm'))return 10;
+      return 0;
+    };
+    candidatePool.sort((a,b)=>tier(b)-tier(a));
+    const routes=candidatePool.slice(0,Number(options.maxCandidates||12));
     if(!routes.length)throw Error('FREE_CAPACITY_UNAVAILABLE');
     const records=[];
     for(const route of routes){
-      for(const category of categories){
+      const routeRecords=await Promise.all(categories.map(async category=>{
         const started=Date.now();let result;
         try{
           result=await caller(route,tests[category]);
@@ -81,7 +113,7 @@ export async function runBenchmark(options={}){
         const quality=is200?grade(category,result.json||{}):{correctness:0,instruction:0,tools:0};
         const rel=is200?reliability(runtime.models?.[route.route]):0;
         const latency=is200?Math.max(0,1-(result.latency_ms??Date.now()-started)/20000):0;
-        records.push({
+        return {
           route:route.route,
           category,
           status:result.status,
@@ -90,8 +122,9 @@ export async function runBenchmark(options={}){
           reliability:rel,
           score:score({...quality,reliability:rel,latency},category),
           tool_correct:quality.tools===1
-        });
-      }
+        };
+      }));
+      records.push(...routeRecords);
     }
     const successfulRecords=records.filter(r=>r.status===200);
     if(!successfulRecords.length)throw Error('benchmark incomplete; production preserved');
@@ -104,7 +137,7 @@ export async function runBenchmark(options={}){
       const challenger=ranked[0];
       const primary=challenger&&shouldPromote(current,challenger,config.promotion_score_margin||7)?challenger.route:(current.route||existing[0]||null);
       const ordered=[primary,...ranked.map(r=>r.route),...existing].filter((x,i,a)=>x&&a.indexOf(x)===i);
-      next.aliases[alias]=ordered.slice(0,Math.max(existing.length,3));
+      next.aliases[alias]=ordered.slice(0,Math.max(existing.length,6));
       recommendations[alias]={current_primary:current.route||null,recommended_primary:primary,rankings:ranked};
     }
     const result={schema_version:2,benchmarked_at:new Date().toISOString(),dry_run:dryRun,candidate_count:routes.length,request_count:records.length,records,recommendations};
