@@ -4,7 +4,7 @@ import path from 'node:path';
 
 const root=process.cwd(),youtube=path.join(root,'docs/assets/youtube'),audioDir=path.join(youtube,'audio'),work=path.join(root,'dist/full-walkthrough-audio');
 await Promise.all([audioDir,work].map(dir=>mkdir(dir,{recursive:true})));
-const ffmpeg=process.env.FFMPEG||'/usr/local/bin/ffmpeg',ffprobe=process.env.FFPROBE||'/usr/local/bin/ffprobe',piper=process.env.PIPER_BIN,model=process.env.PIPER_MODEL;
+const ffmpeg=process.env.FFMPEG||'/opt/homebrew/bin/ffmpeg',ffprobe=process.env.FFPROBE||'/opt/homebrew/bin/ffprobe',piper=process.env.PIPER_BIN,model=process.env.PIPER_MODEL;
 if(!piper||!model)throw Error('PIPER_BIN and PIPER_MODEL are required');
 const command=(program,args,stdio='pipe')=>new Promise((resolve,reject)=>{const child=spawn(program,args,{stdio:stdio==='pipe'?['ignore','pipe','pipe']:'inherit'});let out='',err='';if(child.stdout)child.stdout.on('data',x=>out+=x);if(child.stderr)child.stderr.on('data',x=>err+=x);child.on('close',code=>code?reject(Error(err||`${program} exited ${code}`)):resolve({out,err}))});
 const run=args=>command(ffmpeg,['-hide_banner','-loglevel','error','-y',...args]);

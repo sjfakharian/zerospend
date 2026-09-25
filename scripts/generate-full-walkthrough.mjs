@@ -4,7 +4,7 @@ import path from 'node:path';
 
 const root=process.cwd(),youtube=path.join(root,'docs/assets/youtube'),work=path.join(root,'dist/full-walkthrough'),validated=path.join(work,'validated'),renderWidth=Number(process.env.WALKTHROUGH_WIDTH||1920),renderHeight=Number(process.env.WALKTHROUGH_HEIGHT||1080),masterOnly=process.env.WALKTHROUGH_MASTER_ONLY==='1',outputName=process.env.WALKTHROUGH_OUTPUT||'zerospend-full-walkthrough.mp4';
 await Promise.all([youtube,work,validated].map(dir=>mkdir(dir,{recursive:true})));
-const ffmpeg=process.env.FFMPEG||'/usr/local/bin/ffmpeg';
+const ffmpeg=process.env.FFMPEG||'/opt/homebrew/bin/ffmpeg';
 const command=(program,args)=>new Promise((resolve,reject)=>{const child=spawn(program,args,{stdio:['ignore','pipe','pipe']});let err='';child.stderr.on('data',x=>err+=x);child.on('close',code=>code?reject(Error(err||`${program} exited ${code}`)):resolve())});
 const run=args=>command(ffmpeg,['-hide_banner','-loglevel','error','-y',...args]);
 const esc=value=>String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');

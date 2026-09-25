@@ -4,7 +4,7 @@ import path from 'node:path';
 
 const root=process.cwd(),assets=path.join(root,'docs/assets'),youtube=path.join(assets,'youtube'),social=path.join(assets,'social'),work=path.join(root,'dist/launch-media-final'),out=path.join(work,'validated');
 await Promise.all([work,out,youtube,social].map(dir=>mkdir(dir,{recursive:true})));
-const ffmpeg=process.env.FFMPEG||'/usr/local/bin/ffmpeg';
+const ffmpeg=process.env.FFMPEG||'/opt/homebrew/bin/ffmpeg';
 const command=(program,args)=>new Promise((resolve,reject)=>{const child=spawn(program,args,{stdio:['ignore','pipe','pipe']});let error='';child.stderr.on('data',chunk=>error+=chunk);child.on('close',code=>code?reject(Error(error||`${program} exited ${code}`)):resolve())}),run=args=>command(ffmpeg,['-hide_banner','-loglevel','error','-y',...args]);
 const esc=value=>String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'),img=async file=>`data:image/jpeg;base64,${(await readFile(file)).toString('base64')}`;
 const shots={overview:await img('docs/screenshots/overview.png'),live:await img('docs/screenshots/routing-outcome.png'),models:await img('docs/screenshots/models.png'),providers:await img('docs/screenshots/models.png'),benchmarks:await img('docs/screenshots/models.png'),safety:await img('docs/screenshots/overview.png')};
