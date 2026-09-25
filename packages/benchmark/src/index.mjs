@@ -62,7 +62,7 @@ export function grade(category,json){
 }
 
 export async function runBenchmark(options={}){
-  const p=options.paths||paths(),dryRun=options.dryRun??false;
+  const p=options.paths||paths(),dryRun=options.dryRun??false,onProgress=typeof options.onProgress==='function'?options.onProgress:(()=>{});
   const defaultCaller=async(route,test)=>{
     const key=route.secret_file?(await readFile(path.join(p.secrets,route.secret_file),'utf8')).trim():'';
     const started=Date.now();
@@ -100,8 +100,23 @@ export async function runBenchmark(options={}){
     candidatePool.sort((a,b)=>tier(b)-tier(a));
     const routes=candidatePool.slice(0,Number(options.maxCandidates||12));
     if(!routes.length)throw Error('FREE_CAPACITY_UNAVAILABLE');
+    await onProgress({
+      type: 'init',
+      candidate_count: routes.length,
+      categories,
+      candidates: routes.map(r => ({ route: r.route, provider: r.provider, model_id: r.model_id })),
+      total_tests: routes.length * categories.length
+    });
     const records=[];
-    for(const route of routes){
+    for(let rIdx = 0; rIdx < routes.length; rIdx++){
+      const route = routes[rIdx];
+      await onProgress({
+        type: 'candidate_start',
+        candidate_index: rIdx + 1,
+        candidate_count: routes.length,
+        route: route.route,
+        provider: route.provider
+      });
       const routeRecords=await Promise.all(categories.map(async category=>{
         const started=Date.now();let result;
         try{
@@ -113,7 +128,7 @@ export async function runBenchmark(options={}){
         const quality=is200?grade(category,result.json||{}):{correctness:0,instruction:0,tools:0};
         const rel=is200?reliability(runtime.models?.[route.route]):0;
         const latency=is200?Math.max(0,1-(result.latency_ms??Date.now()-started)/20000):0;
-        return {
+        const rec = {
           route:route.route,
           category,
           status:result.status,
@@ -123,8 +138,25 @@ export async function runBenchmark(options={}){
           score:score({...quality,reliability:rel,latency},category),
           tool_correct:quality.tools===1
         };
+        await onProgress({
+          type: 'test_done',
+          candidate_index: rIdx + 1,
+          candidate_count: routes.length,
+          route: route.route,
+          category,
+          record: rec
+        });
+        return rec;
       }));
       records.push(...routeRecords);
+      await onProgress({
+        type: 'candidate_done',
+        candidate_index: rIdx + 1,
+        candidate_count: routes.length,
+        route: route.route,
+        completed_tests: records.length,
+        total_tests: routes.length * categories.length
+      });
     }
     const successfulRecords=records.filter(r=>r.status===200);
     if(!successfulRecords.length)throw Error('benchmark incomplete; production preserved');
@@ -149,6 +181,10 @@ export async function runBenchmark(options={}){
       await atomicJson(path.join(p.config,'routing.json'),next);
       await atomicJson(path.join(p.state,'ranking-history.json'),{updated_at:new Date().toISOString(),backup,recommendations});
     }
+    await onProgress({
+      type: 'complete',
+      result
+    });
     return result;
   });
 }
