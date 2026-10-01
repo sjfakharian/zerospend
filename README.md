@@ -93,11 +93,26 @@ Each alias is an ordered verified-free fallback chain. A route is attempted only
 
 ## Integrations
 
-- **Hermes Agent:** custom OpenAI-compatible provider at `http://127.0.0.1:20129/v1`.
-- **TypingMind:** model `smart-free`, endpoint `http://127.0.0.1:20129/v1/chat/completions`, dedicated local bearer token.
-- **Other clients:** use the same API base and local token.
+ZeroSpend exposes a standard OpenAI-compatible API base (`http://127.0.0.1:20129/v1`). You can drop it into any tool or IDE:
 
-See [Hermes](docs/integrations/hermes.md), [TypingMind](docs/integrations/typingmind.md), and [generic clients](docs/integrations/openai-compatible.md).
+| Client | Base URL | Model | Guide |
+|---|---|---|---|
+| **Cursor** | `http://127.0.0.1:20129/v1` | `smart-free` / `free-code` | [Cursor Guide](docs/integrations/cursor-continue.md) |
+| **Continue (VS Code)** | `http://127.0.0.1:20129/v1` | `smart-free` / `free-fast` | [Continue Guide](docs/integrations/cursor-continue.md) |
+| **LibreChat** | `http://host.docker.internal:20129/v1` | `smart-free` | [LibreChat Guide](docs/integrations/librechat-openwebui.md) |
+| **Open-WebUI** | `http://host.docker.internal:20129/v1` | `smart-free` | [Open-WebUI Guide](docs/integrations/librechat-openwebui.md) |
+| **Hermes Agent** | `http://127.0.0.1:20129/v1` | `smart-free` | [Hermes Guide](docs/integrations/hermes.md) |
+| **TypingMind** | `http://127.0.0.1:20129/v1/chat/completions` | `smart-free` | [TypingMind Guide](docs/integrations/typingmind.md) |
+| **Python / curl / Node** | `http://127.0.0.1:20129/v1` | `smart-free` | [Generic Clients](docs/integrations/openai-compatible.md) |
+
+```bash
+# Test with curl right away
+curl http://127.0.0.1:20129/v1/chat/completions \
+  -H "Authorization: Bearer $(cat ~/.zerospend/secrets/local.token)" \
+  -H "Content-Type: application/json" \
+  -d '{"model":"smart-free","messages":[{"role":"user","content":"Hello world!"}]}'
+```
+
 
 ## Free-only guarantee
 
