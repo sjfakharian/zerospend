@@ -2,13 +2,26 @@
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-10-01
+
 ### Added
 
 - Direct APINex provider support with hidden credential entry, fail-closed free/zero-price evidence, and bounded availability verification.
+- Real-time streaming benchmark progress visualizer and transparent results leaderboard in the Console automation view.
+- Live Console auto-refresh with status indicator and visible last-updated timestamp.
+- Interactive multi-column sorting (ascending/descending) across all Console tables with state preservation.
+- Daily stacked token consumption chart by model with smooth CSS animations, hover tooltips, and exact token counts.
+- Dynamic Console port detection preserving user-configured runtime ports.
 
 ### Fixed
 
+- Router SSE stream token accounting now reliably extracts `usage` blocks from final stream chunks.
+- Exact unit resolution for token counts across metric cards and table rows instead of compact abbreviations.
 - Integration-test service startup checks now retain a bounded five-second budget under parallel load.
+
+### Changed
+
+- Frontier model ranking and benchmark scoring now incorporate runtime reliability weighting and anti-churn thresholds.
 
 ## [0.3.0] - 2026-08-27
 
