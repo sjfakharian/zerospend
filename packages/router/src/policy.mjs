@@ -3,24 +3,24 @@ export function validateConfig(config,inventory){if(config?.zero_cost_policy!=="
 export function capacityHealth(config,inventory){validateConfig(config,inventory);const aliases=config.aliases||{},empty_aliases=Object.entries(aliases).filter(([,routes])=>routes.length===0).map(([alias])=>alias),proofs=Object.values(inventory?.routes||{}),paid_routes=proofs.filter(route=>route.production_eligible&&route.zero_cost!==true).length,unverified_routes=proofs.filter(route=>route.production_eligible&&!isVerifiedFree(route.route,inventory)).length;return {status:empty_aliases.length?'degraded':'ok',strict_free:true,paid_routes,unverified_routes,empty_aliases}}
 export function orderRoutes(routes,stats={},options={}){
   const rateLimited=options.rateLimited||new Map(),benchmarkScores=options.benchmarkScores||{},category=options.category||'';
-  return [...routes].sort((a,b)=>{
-    const now=Date.now();
-    const entryA=rateLimited.get?.(a),entryB=rateLimited.get?.(b);
-    const coolA=entryA&&now-(entryA.timestamp||now)<(Number(entryA.retry_after)?Number(entryA.retry_after)*1000:60000)?1:0;
-    const coolB=entryB&&now-(entryB.timestamp||now)<(Number(entryB.retry_after)?Number(entryB.retry_after)*1000:60000)?1:0;
-    if(coolA!==coolB)return coolA-coolB;
-    const sa=stats[a]||{},sb=stats[b]||{};
-    const statScore=x=>(x.success_rate??.75)*100-(x.rate_limit_rate||0)*60-Math.min(25,(x.p50_latency_ms||0)/1000);
-    const benchA=Number(benchmarkScores[a]||0),benchB=Number(benchmarkScores[b]||0);
-    const tier=r=>{
-      const s=String(r||'').toLowerCase();
-      if(s.includes('ultra')||s.includes('550b')||s.includes('340b')||s.includes('gpt-6')||s.includes('deepseek-v4-pro'))return 35;
-      if(s.includes('super')||s.includes('120b')||s.includes('deepseek-v4.1')||s.includes('deepseek-v4')||s.includes('mimo-v2.6-pro'))return 25;
-      if(s.includes('lightning')||s.includes('70b')||s.includes('pro')||s.includes('coder')||s.includes('kimi'))return 20;
-      if(s.includes('flash')||s.includes('30b')||s.includes('27b')||s.includes('qwen')||s.includes('glm'))return 12;
-      if(s.includes('2.6b')||s.includes('2b')||s.includes('mini')||s.includes('note-preview'))return category==='fast'?15:-10;
-      return 0;
-    };
-    return (statScore(sb)+benchB+tier(b))-(statScore(sa)+benchA+tier(a));
-  });
+  const now=Date.now();
+  const getScore = r => {
+    const entry=rateLimited.get?.(r);
+    const cool=entry&&now-(entry.timestamp||now)<(Number(entry.retry_after)?Number(entry.retry_after)*1000:60000)?1:0;
+    const s=stats[r]||{};
+    const statScore=(s.success_rate??.75)*100-(s.rate_limit_rate||0)*60-Math.min(25,(s.p50_latency_ms||0)/1000);
+    const bench=Number(benchmarkScores[r]||0);
+    const str=String(r||'').toLowerCase();
+    let tier=0;
+    if(str.includes('ultra')||str.includes('550b')||str.includes('340b')||str.includes('gpt-6')||str.includes('deepseek-v4-pro'))tier=35;
+    else if(str.includes('super')||str.includes('120b')||str.includes('deepseek-v4.1')||str.includes('deepseek-v4')||str.includes('mimo-v2.6-pro'))tier=25;
+    else if(str.includes('lightning')||str.includes('70b')||str.includes('pro')||str.includes('coder')||str.includes('kimi'))tier=20;
+    else if(str.includes('flash')||str.includes('30b')||str.includes('27b')||str.includes('qwen')||str.includes('glm'))tier=12;
+    else if(str.includes('2.6b')||str.includes('2b')||str.includes('mini')||str.includes('note-preview'))tier=category==='fast'?15:-10;
+    return { cool, score: statScore + bench + tier, route: r };
+  };
+  return [...routes].map(getScore).sort((a,b)=>{
+    if(a.cool!==b.cool)return a.cool-b.cool;
+    return b.score-a.score;
+  }).map(x=>x.route);
 }
