@@ -1,0 +1,3 @@
+## 2025-02-12 - Schwartzian Transform for orderRoutes in ZeroSpend Policy
+**Learning:** The ZeroSpend router policy dynamically grades and sorts hundreds of routes per request. The original `orderRoutes` used `Array.prototype.sort()` and calculated the grade for each route on every comparison using inline string checks and math. This generated excessive computational overhead on the hot path (O(N log N) complex calculations instead of O(N)).
+**Action:** Always pre-calculate expensive sorting criteria using an O(N) map pass (the Schwartzian transform pattern: decorate-sort-undecorate) to perform the math and string checks exactly once per item, and then sort based on the primitive results.
