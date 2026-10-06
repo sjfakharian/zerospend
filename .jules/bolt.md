@@ -8,3 +8,6 @@
 ## 2026-10-06 - Deferring text extraction in classification
 **Learning:** Extracting stringified message context sequentially across large array inputs for deterministic classification carries unnecessary O(N) cost if fast object checks (like `body.tools`) would immediately cause an early return.
 **Action:** Defer extracting or aggregating text components from complex JSON bodies until all fast, metadata-based preconditions are evaluated, effectively turning an O(N) operation into O(1) on certain paths.
+## 2026-10-06 - Parallelizing async operations in loops
+**Learning:** Sequential `await` in loops can lead to poor performance, particularly when the inner body contains multiple async calls (e.g. network checks like `verifyFree` and `healthCheck`). It multiplies the latency by the number of iterations.
+**Action:** Use `Promise.all` with `Array.prototype.map` to execute loop bodies concurrently when the iterations are independent.

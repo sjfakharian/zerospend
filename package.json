@@ -27,7 +27,7 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "vitepress": "1.6.4"
+    "vitepress": "^1.6.4"
   },
   "overrides": {
     "vitepress": {
