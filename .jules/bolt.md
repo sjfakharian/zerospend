@@ -8,3 +8,6 @@
 ## 2026-10-06 - Deferring text extraction in classification
 **Learning:** Extracting stringified message context sequentially across large array inputs for deterministic classification carries unnecessary O(N) cost if fast object checks (like `body.tools`) would immediately cause an early return.
 **Action:** Defer extracting or aggregating text components from complex JSON bodies until all fast, metadata-based preconditions are evaluated, effectively turning an O(N) operation into O(1) on certain paths.
+## 2024-05-18 - Promise.all for file I/O optimization
+**Learning:** Sequential file reads (even small JSON files) create significant unnecessary I/O overhead. Grouping independent asynchronous operations significantly decreases response times for frequently hit routes.
+**Action:** When handling multiple independent asynchronous reads or API calls, always identify if they can be executed concurrently with `Promise.all`.
