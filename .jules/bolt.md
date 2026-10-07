@@ -8,3 +8,6 @@
 ## 2026-10-06 - Deferring text extraction in classification
 **Learning:** Extracting stringified message context sequentially across large array inputs for deterministic classification carries unnecessary O(N) cost if fast object checks (like `body.tools`) would immediately cause an early return.
 **Action:** Defer extracting or aggregating text components from complex JSON bodies until all fast, metadata-based preconditions are evaluated, effectively turning an O(N) operation into O(1) on certain paths.
+## 2025-02-12 - Caching file reads on the hot path
+**Learning:** In the ZeroSpend router, `attempt()` is called for every route candidate per request. Reading the secret file from disk (`await readFile`) inside this fast-path function creates unnecessary asynchronous disk I/O, which significantly slows down request handling.
+**Action:** Always memoize/cache static files like API keys in memory after the first read using a simple `Map` to prevent repeated disk I/O on every request.
