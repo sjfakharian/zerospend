@@ -8,3 +8,7 @@
 ## 2026-10-06 - Deferring text extraction in classification
 **Learning:** Extracting stringified message context sequentially across large array inputs for deterministic classification carries unnecessary O(N) cost if fast object checks (like `body.tools`) would immediately cause an early return.
 **Action:** Defer extracting or aggregating text components from complex JSON bodies until all fast, metadata-based preconditions are evaluated, effectively turning an O(N) operation into O(1) on certain paths.
+
+## 2024-10-07 - Policy string processing bottleneck
+**Learning:** Checking string `.includes()` for multiple model names inside hot loops (`orderRoutes`) is surprisingly slow because it performs many redundant array allocations implicitly and string matching per route repeatedly.
+**Action:** Always pre-calculate or cache deterministic string processing on inputs like route/model IDs inside hot loops by using a module-level Map.
