@@ -58,3 +58,20 @@ test('formats anthropic SSE events', ()=>{
   assert.ok(sse.startsWith('event: content_block_delta\ndata: {'));
   assert.ok(sse.endsWith('\n\n'));
 });
+
+test('supports claude model names and retains them in response', ()=>{
+  const anthropicBody = {
+    model: 'claude-3-5-sonnet',
+    messages: [{ role: 'user', content: 'Hello' }]
+  };
+  const openAi = anthropicToOpenAIPayload(anthropicBody);
+  assert.equal(openAi.model, 'claude-3-5-sonnet');
+
+  const openAiRes = {
+    choices: [{ message: { content: 'Hi there!' }, finish_reason: 'stop' }],
+    usage: { prompt_tokens: 10, completion_tokens: 3 }
+  };
+  const anthropicRes = openAIToAnthropicResponse(openAiRes, 'claude-3-5-sonnet', 'test-uuid');
+  assert.equal(anthropicRes.model, 'claude-3-5-sonnet');
+  assert.equal(anthropicRes.content[0].text, 'Hi there!');
+});
