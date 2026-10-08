@@ -136,6 +136,42 @@ test('extracts DSML and raw tool calls if model outputs text fallback', ()=>{
   assert.equal(parsed.toolCalls.length, 1);
   assert.equal(parsed.toolCalls[0].function.name, 'Bash');
   assert.deepEqual(JSON.parse(parsed.toolCalls[0].function.arguments), { command: 'pwd' });
+
+  const dsmlXmlText = `<|DSML|> invoke name="Bash"
+<|DSML|> parameter name="command" string="true">ls -la</|DSML|> parameter
+<|DSML|> parameter name="description" string="true">List files in current directory</|DSML|> parameter
+</|DSML|> invoke>`;
+  const parsedXml = extractTextToolCalls(dsmlXmlText);
+  assert.equal(parsedXml.toolCalls.length, 1);
+  assert.equal(parsedXml.toolCalls[0].function.name, 'Bash');
+  assert.deepEqual(JSON.parse(parsedXml.toolCalls[0].function.arguments), {
+    command: 'ls -la',
+    description: 'List files in current directory'
+  });
+  assert.equal(parsedXml.cleanContent, '');
+});
+
+test('sanitizes DSML in assistant history to prevent prompt repetition', ()=>{
+  const payload = {
+    messages: [
+      {
+        role: 'assistant',
+        content: `<|DSML|> invoke name="Bash"
+<|DSML|> parameter name="command" string="true">ls -la</|DSML|> parameter
+</|DSML|> invoke>`
+      },
+      {
+        role: 'user',
+        content: 'now show me index.html'
+      }
+    ]
+  };
+  const openAi = anthropicToOpenAIPayload(payload);
+  assert.equal(openAi.messages[0].role, 'assistant');
+  assert.equal(openAi.messages[0].tool_calls.length, 1);
+  assert.equal(openAi.messages[0].tool_calls[0].function.name, 'Bash');
+  assert.deepEqual(JSON.parse(openAi.messages[0].tool_calls[0].function.arguments), { command: 'ls -la' });
+  assert.equal(openAi.messages[0].content, null);
 });
 
 test('formats anthropic SSE events', ()=>{

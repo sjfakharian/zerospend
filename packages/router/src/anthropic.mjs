@@ -10,7 +10,16 @@ export function anthropicToOpenAIPayload(body={}){
     for(const m of body.messages){
       const role=m.role||'user';
       if(typeof m.content==='string'){
-        messages.push({role,content:m.content});
+        if(role==='assistant'&&(m.content.includes('DSML')||m.content.includes('<tool_call>'))){
+          const parsed=extractTextToolCalls(m.content);
+          const msgObj={role:'assistant',content:parsed.cleanContent||null};
+          if(parsed.toolCalls.length>0)msgObj.tool_calls=parsed.toolCalls;
+          messages.push(msgObj);
+        }else if(role==='user'&&(m.content.includes('DSML')||m.content.includes('<tool_call>'))){
+          messages.push({role:'user',content:m.content.replace(/<[|｜]DSML[|｜]>/gi,'[tool]')});
+        }else{
+          messages.push({role,content:m.content});
+        }
       }else if(Array.isArray(m.content)){
         if(role==='assistant'){
           const textBlocks=[];
@@ -29,7 +38,15 @@ export function anthropicToOpenAIPayload(body={}){
               });
             }
           }
-          const msgObj={role:'assistant',content:textBlocks.join('\n')||null};
+          let combinedText=textBlocks.join('\n');
+          if(combinedText.includes('DSML')||combinedText.includes('<tool_call>')){
+            const parsed=extractTextToolCalls(combinedText);
+            if(parsed.toolCalls.length>0){
+              toolCalls.push(...parsed.toolCalls);
+              combinedText=parsed.cleanContent;
+            }
+          }
+          const msgObj={role:'assistant',content:combinedText||null};
           if(toolCalls.length>0)msgObj.tool_calls=toolCalls;
           messages.push(msgObj);
         }else{
@@ -47,7 +64,11 @@ export function anthropicToOpenAIPayload(body={}){
             }
           }
           for(const tr of toolResults)messages.push(tr);
-          if(textBlocks.length>0)messages.push({role:'user',content:textBlocks.join('\n')});
+          if(textBlocks.length>0){
+            let userText=textBlocks.join('\n');
+            if(userText.includes('DSML'))userText=userText.replace(/<[|｜]DSML[|｜]>/gi,'[tool]');
+            messages.push({role:'user',content:userText});
+          }
         }
       }else{
         messages.push({role,content:String(m.content||'')});
@@ -85,22 +106,34 @@ export function anthropicToOpenAIPayload(body={}){
 export function extractTextToolCalls(text=''){
   const toolCalls=[];
   let clean=text;
-  const dsmlRegex=/<[|｜]DSML[|｜]>\s*invoke:([a-zA-Z0-9_.-]+)(?:[^\n]*\n)?([\s\S]*?)(?:<[|｜]|\n\n|$)/gi;
+  const dsmlRegex=/<[|｜]DSML[|｜]>?\s*invoke(?:\s+name="([^"]+)"|:([a-zA-Z0-9_.-]+))[\s\S]*?(?:<\/[|｜]DSML[|｜]>?\s*invoke>?|<[|｜]call end[|｜]>|$)/gi;
   let match;
-  while((match=dsmlRegex.exec(text))!==null){
-    const name=match[1];
-    let argsStr=match[2].trim();
-    const jsonMatch=argsStr.match(/\{[\s\S]*\}/);
-    if(jsonMatch)argsStr=jsonMatch[0];
+  while((match=dsmlRegex.exec(clean))!==null){
+    const fullBlock=match[0];
+    const name=match[1]||match[2];
+    const args={};
+    const paramRegex=/<[|｜]DSML[|｜]>?\s*parameter(?:\s+name="([^"]+)"|\s+([^>]+))[^>]*>([\s\S]*?)(?:<\/[|｜]DSML[|｜]>?\s*parameter>?|<\/[|｜]DSML[|｜]>?|$)/gi;
+    let pMatch;
+    let hasParams=false;
+    while((pMatch=paramRegex.exec(fullBlock))!==null){
+      hasParams=true;
+      args[pMatch[1]]=pMatch[3].trim();
+    }
+    if(!hasParams){
+      const jsonMatch=fullBlock.match(/\{[\s\S]*\}/);
+      if(jsonMatch){
+        try{Object.assign(args,JSON.parse(jsonMatch[0]))}catch{}
+      }
+    }
     toolCalls.push({
       id:`toolu_${randomUUID().replace(/-/g,'').slice(0,16)}`,
       type:'function',
-      function:{name,arguments:argsStr||'{}'}
+      function:{name,arguments:JSON.stringify(args)}
     });
-    clean=clean.replace(match[0],'').trim();
+    clean=clean.replace(fullBlock,'').trim();
   }
   const dsToolRegex=/<[|｜]tool call begin[|｜]>(?:function)?<[|｜]tool sep[|｜]>([a-zA-Z0-9_.-]+)\s*```(?:json)?\s*([\s\S]*?)\s*```\s*<[|｜]tool call end[|｜]>/gi;
-  while((match=dsToolRegex.exec(text))!==null){
+  while((match=dsToolRegex.exec(clean))!==null){
     toolCalls.push({
       id:`toolu_${randomUUID().replace(/-/g,'').slice(0,16)}`,
       type:'function',
@@ -109,7 +142,7 @@ export function extractTextToolCalls(text=''){
     clean=clean.replace(match[0],'').trim();
   }
   const xmlToolRegex=/<tool_call>\s*([\s\S]*?)\s*<\/tool_call>/gi;
-  while((match=xmlToolRegex.exec(text))!==null){
+  while((match=xmlToolRegex.exec(clean))!==null){
     try{
       const obj=JSON.parse(match[1]);
       if(obj.name){
