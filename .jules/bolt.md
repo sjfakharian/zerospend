@@ -8,3 +8,7 @@
 ## 2026-10-06 - Deferring text extraction in classification
 **Learning:** Extracting stringified message context sequentially across large array inputs for deterministic classification carries unnecessary O(N) cost if fast object checks (like `body.tools`) would immediately cause an early return.
 **Action:** Defer extracting or aggregating text components from complex JSON bodies until all fast, metadata-based preconditions are evaluated, effectively turning an O(N) operation into O(1) on certain paths.
+
+## 2023-11-20 - Prevent Disk I/O in Hot Paths
+**Learning:** Reading provider secret keys from disk (`readFile`) synchronously or asynchronously on every single API request in `server.mjs` creates an unnecessary performance bottleneck that scales poorly under load.
+**Action:** Use an in-memory cache (`Map`) for file contents that rarely change (like secrets/configurations) initialized once during server startup or populated lazily, eliminating disk I/O on the hot path entirely.
