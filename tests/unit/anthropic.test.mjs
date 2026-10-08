@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {anthropicToOpenAIPayload,openAIToAnthropicResponse,formatAnthropicEvent} from '../../packages/router/src/anthropic.mjs';
+import {anthropicToOpenAIPayload,openAIToAnthropicResponse,formatAnthropicEvent,extractTextToolCalls} from '../../packages/router/src/anthropic.mjs';
 
 test('converts simple anthropic messages payload to openai format', ()=>{
   const anthropicBody = {
@@ -39,6 +39,57 @@ test('converts content block arrays correctly', ()=>{
   assert.equal(openAi.messages[1].content, 'Hello\nWorld');
 });
 
+test('converts tools and multi-turn tool history correctly', ()=>{
+  const anthropicBody = {
+    model: 'smart-claude-free',
+    tools: [
+      {
+        name: 'Bash',
+        description: 'Run bash command',
+        input_schema: {
+          type: 'object',
+          properties: { command: { type: 'string' } },
+          required: ['command']
+        }
+      }
+    ],
+    tool_choice: { type: 'auto' },
+    messages: [
+      { role: 'user', content: 'List files in directory' },
+      {
+        role: 'assistant',
+        content: [
+          { type: 'text', text: 'Let me run ls.' },
+          { type: 'tool_use', id: 'call_123', name: 'Bash', input: { command: 'ls -la' } }
+        ]
+      },
+      {
+        role: 'user',
+        content: [
+          { type: 'tool_result', tool_use_id: 'call_123', content: 'total 0\n-rw-r--r-- file.txt' }
+        ]
+      }
+    ]
+  };
+
+  const openAi = anthropicToOpenAIPayload(anthropicBody);
+  assert.equal(openAi.tools.length, 1);
+  assert.equal(openAi.tools[0].type, 'function');
+  assert.equal(openAi.tools[0].function.name, 'Bash');
+  assert.deepEqual(openAi.tools[0].function.parameters, anthropicBody.tools[0].input_schema);
+  assert.equal(openAi.tool_choice, 'auto');
+
+  assert.equal(openAi.messages.length, 3);
+  assert.equal(openAi.messages[0].role, 'user');
+  assert.equal(openAi.messages[1].role, 'assistant');
+  assert.equal(openAi.messages[1].tool_calls.length, 1);
+  assert.equal(openAi.messages[1].tool_calls[0].id, 'call_123');
+  assert.equal(openAi.messages[1].tool_calls[0].function.name, 'Bash');
+  assert.equal(openAi.messages[2].role, 'tool');
+  assert.equal(openAi.messages[2].tool_call_id, 'call_123');
+  assert.equal(openAi.messages[2].content, 'total 0\n-rw-r--r-- file.txt');
+});
+
 test('converts openai response to anthropic response', ()=>{
   const openAiRes = {
     choices: [{ message: { content: '4' }, finish_reason: 'stop' }],
@@ -51,6 +102,40 @@ test('converts openai response to anthropic response', ()=>{
   assert.equal(anthropic.stop_reason, 'end_turn');
   assert.equal(anthropic.usage.input_tokens, 15);
   assert.equal(anthropic.usage.output_tokens, 2);
+});
+
+test('converts openai response with tool_calls to anthropic response', ()=>{
+  const openAiRes = {
+    choices: [{
+      message: {
+        content: 'Running the command',
+        tool_calls: [{
+          id: 'call_999',
+          type: 'function',
+          function: { name: 'Bash', arguments: '{"command":"ls -la"}' }
+        }]
+      },
+      finish_reason: 'tool_calls'
+    }],
+    usage: { prompt_tokens: 50, completion_tokens: 20 }
+  };
+  const anthropic = openAIToAnthropicResponse(openAiRes, 'provider/model', '1234');
+  assert.equal(anthropic.stop_reason, 'tool_use');
+  assert.equal(anthropic.content.length, 2);
+  assert.equal(anthropic.content[0].type, 'text');
+  assert.equal(anthropic.content[0].text, 'Running the command');
+  assert.equal(anthropic.content[1].type, 'tool_use');
+  assert.equal(anthropic.content[1].id, 'call_999');
+  assert.equal(anthropic.content[1].name, 'Bash');
+  assert.deepEqual(anthropic.content[1].input, { command: 'ls -la' });
+});
+
+test('extracts DSML and raw tool calls if model outputs text fallback', ()=>{
+  const dsmlText = '<|DSML|> invoke:Bash\n{"command":"pwd"}\n<|call end|>';
+  const parsed = extractTextToolCalls(dsmlText);
+  assert.equal(parsed.toolCalls.length, 1);
+  assert.equal(parsed.toolCalls[0].function.name, 'Bash');
+  assert.deepEqual(JSON.parse(parsed.toolCalls[0].function.arguments), { command: 'pwd' });
 });
 
 test('formats anthropic SSE events', ()=>{
