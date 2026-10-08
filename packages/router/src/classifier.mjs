@@ -1,5 +1,26 @@
 export const aliases=["free-code","free-sql","free-reasoning","free-general","free-tools","free-fast","free-long-context","free-structured"];
-export function textOf(messages=[]){return messages.filter(m=>m?.role==="user").map(m=>typeof m.content==="string"?m.content:Array.isArray(m.content)?m.content.map(p=>p.text||"").join("\n"):"").join("\n")}
+export function textOf(messages=[]) {
+  // Opt: avoid intermediate array allocations (.map, .filter, .join)
+  // by using a single pass loop and string concatenation
+  let text = "";
+  for (let i = 0; i < messages.length; i++) {
+    const m = messages[i];
+    if (m?.role === "user") {
+      if (text.length > 0) text += "\n";
+      if (typeof m.content === "string") {
+        text += m.content;
+      } else if (Array.isArray(m.content)) {
+        let pText = "";
+        for (let j = 0; j < m.content.length; j++) {
+          if (pText.length > 0) pText += "\n";
+          pText += m.content[j].text || "";
+        }
+        text += pText;
+      }
+    }
+  }
+  return text;
+}
 export function classify(body={}){
   const tools=Array.isArray(body.tools)&&body.tools.length>0;
   if(body.functions||(body.tool_choice&&!['auto','none'].includes(String(body.tool_choice).toLowerCase()))||tools)return {alias:"free-tools",reason:"tool-definition-or-choice"};
