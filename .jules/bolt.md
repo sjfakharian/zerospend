@@ -8,3 +8,6 @@
 ## 2026-10-06 - Deferring text extraction in classification
 **Learning:** Extracting stringified message context sequentially across large array inputs for deterministic classification carries unnecessary O(N) cost if fast object checks (like `body.tools`) would immediately cause an early return.
 **Action:** Defer extracting or aggregating text components from complex JSON bodies until all fast, metadata-based preconditions are evaluated, effectively turning an O(N) operation into O(1) on certain paths.
+## 2025-03-01 - Avoid micro-optimizations that impact readability with no measurable impact
+**Learning:** I attempted to optimize array iterations `.filter().map().join()` into a single `for` loop in `textOf` function to prevent array allocations. Even though benchmark showed ~75% speedup for extracting messages, since the chat messages array are usually very small, this has 0 measurable impact. In addition, the `for` loop implementation failed to properly consider empty strings that `p.text` missed due to being falsy which caused a functional regression when newline characters were skipped.
+**Action:** Do not sacrifice readability to perform micro-optimizations. Focus optimizations on high impact processing such as large loops, network queries, repeated API calls or operations on unbounded data sizes.
