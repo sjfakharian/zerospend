@@ -8,3 +8,6 @@
 ## 2026-10-06 - Deferring text extraction in classification
 **Learning:** Extracting stringified message context sequentially across large array inputs for deterministic classification carries unnecessary O(N) cost if fast object checks (like `body.tools`) would immediately cause an early return.
 **Action:** Defer extracting or aggregating text components from complex JSON bodies until all fast, metadata-based preconditions are evaluated, effectively turning an O(N) operation into O(1) on certain paths.
+## 2025-10-10 - Fast path for regex parsing
+**Learning:** Extracting text tool calls using regular expressions is extremely slow on large text bodies. We can skip the expensive operations entirely if a fast check like `!text.includes("<")` passes, saving significant processing time.
+**Action:** Always look for O(1) preconditions that can skip O(N) or more expensive processing tasks entirely.
