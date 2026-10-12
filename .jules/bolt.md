@@ -8,3 +8,7 @@
 ## 2026-10-06 - Deferring text extraction in classification
 **Learning:** Extracting stringified message context sequentially across large array inputs for deterministic classification carries unnecessary O(N) cost if fast object checks (like `body.tools`) would immediately cause an early return.
 **Action:** Defer extracting or aggregating text components from complex JSON bodies until all fast, metadata-based preconditions are evaluated, effectively turning an O(N) operation into O(1) on certain paths.
+
+## 2023-10-24 - Pre-calculating array filters inside iterative operations
+**Learning:** `providerMetadata` mapped over providers and ran `routes.filter` twice per provider. This `O(P * R)` scaling becomes problematic as provider and route lists grow. `doctor` and `setupZeroSpend` mapped `routes.filter` twice on the exact same array.
+**Action:** Use a single loop (or `reduce`) to calculate the matching array filters once, then assign them. This drops `O(P * 2R)` complexity to `O(P + R)`.
