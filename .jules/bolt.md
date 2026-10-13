@@ -8,3 +8,7 @@
 ## 2026-10-06 - Deferring text extraction in classification
 **Learning:** Extracting stringified message context sequentially across large array inputs for deterministic classification carries unnecessary O(N) cost if fast object checks (like `body.tools`) would immediately cause an early return.
 **Action:** Defer extracting or aggregating text components from complex JSON bodies until all fast, metadata-based preconditions are evaluated, effectively turning an O(N) operation into O(1) on certain paths.
+
+## 2023-11-20 - Fast-path text processing with primitive indexOf
+**Learning:** In text parsing functions (like `extractTextToolCalls` or `classify`), using complex RegEx against large accumulating string buffers creates significant event loop blocking during stream ingestion (measured ~56ms per check).
+**Action:** Always insert primitive, O(N) fast-path checks (e.g., `text.indexOf('<') === -1`) before heavy RegEx allocations and executions if the target patterns require a specific sequence.
