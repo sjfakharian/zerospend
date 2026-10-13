@@ -8,3 +8,6 @@
 ## 2026-10-06 - Deferring text extraction in classification
 **Learning:** Extracting stringified message context sequentially across large array inputs for deterministic classification carries unnecessary O(N) cost if fast object checks (like `body.tools`) would immediately cause an early return.
 **Action:** Defer extracting or aggregating text components from complex JSON bodies until all fast, metadata-based preconditions are evaluated, effectively turning an O(N) operation into O(1) on certain paths.
+## 2024-05-18 - Deferring expensive regex on large text inputs
+**Learning:** In LLM proxies/routers, request body messages can be massive (e.g., hundreds of kilobytes or even megabytes of context). Running expensive regex operations (like those matching tool calls) on strings that deterministically will fail creates a massive synchronous CPU spike.
+**Action:** Defer heavy string manipulations and regex operations until after validating fast preconditions (like `text.includes('<')`) to avoid blocking the Event Loop on long contexts.
