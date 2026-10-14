@@ -104,6 +104,8 @@ export function anthropicToOpenAIPayload(body={}){
 }
 
 export function extractTextToolCalls(text=''){
+  // Fast path: skip expensive regex parsing if no potential tags exist
+  if(!text.includes('<'))return {toolCalls:[],cleanContent:text};
   const toolCalls=[];
   let clean=text;
   const dsmlRegex=/<[|｜]DSML[|｜]>?\s*invoke(?:\s+name="([^"]+)"|:([a-zA-Z0-9_.-]+))[\s\S]*?(?:<\/[|｜]DSML[|｜]>?\s*invoke>?|<[|｜]call end[|｜]>|$)/gi;
