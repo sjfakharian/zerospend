@@ -2,6 +2,7 @@ import path from 'node:path';
 import {copyFile,mkdir,readFile} from 'node:fs/promises';
 import {paths} from '../../shared/src/paths.mjs';
 import {atomicJson,readJson,withLock} from '../../shared/src/files.mjs';
+import {getGlobalBenchmark,syncGlobalBenchmarks,GLOBAL_BENCHMARK_CATALOG} from './global-benchmarks.mjs';
 
 export const categories=['code','sql','reasoning','general','tools','fast','long-context','structured'];
 
@@ -21,9 +22,18 @@ const tests={
 };
 
 export function score(result,category){
-  const weights={correctness:45,instruction:15,reliability:20,latency:10,tools:10};
-  if(category==='tools'){weights.tools=45;weights.correctness=10}
-  return Number(Object.entries(weights).reduce((n,[k,w])=>n+(Number(result[k])||0)*w,0).toFixed(2))
+  const weights={correctness:40,instruction:15,reliability:20,latency:10,tools:10,global:5};
+  if(category==='tools'){weights.tools=40;weights.correctness=10}
+  let globalVal=0.75;
+  if(typeof result?.global==='number'){
+    globalVal=result.global;
+  }else if(result?.global&&typeof result.global.intelligence_index==='number'){
+    globalVal=Math.min(1,Math.max(0,result.global.intelligence_index/100));
+  }else if(result?.global&&typeof result.global.arena_elo==='number'){
+    globalVal=Math.min(1,Math.max(0,(result.global.arena_elo-1000)/400));
+  }
+  const evalResult={...result,global:globalVal};
+  return Number(Object.entries(weights).reduce((n,[k,w])=>n+(Number(evalResult[k])||0)*w,0).toFixed(2));
 }
 
 export function shouldPromote(current,challenger,threshold=7){
@@ -110,6 +120,7 @@ export async function runBenchmark(options={}){
     const records=[];
     for(let rIdx = 0; rIdx < routes.length; rIdx++){
       const route = routes[rIdx];
+      const globalMeta = getGlobalBenchmark(route.route || route.model_id);
       await onProgress({
         type: 'candidate_start',
         candidate_index: rIdx + 1,
@@ -135,7 +146,8 @@ export async function runBenchmark(options={}){
           latency_ms:result.latency_ms??Date.now()-started,
           quality,
           reliability:rel,
-          score:score({...quality,reliability:rel,latency},category),
+          global:globalMeta,
+          score:score({...quality,reliability:rel,latency,global:globalMeta},category),
           tool_correct:quality.tools===1
         };
         await onProgress({
@@ -188,3 +200,5 @@ export async function runBenchmark(options={}){
     return result;
   });
 }
+
+export {getGlobalBenchmark,syncGlobalBenchmarks,GLOBAL_BENCHMARK_CATALOG};
