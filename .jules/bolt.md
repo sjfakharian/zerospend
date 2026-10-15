@@ -8,3 +8,6 @@
 ## 2026-10-06 - Deferring text extraction in classification
 **Learning:** Extracting stringified message context sequentially across large array inputs for deterministic classification carries unnecessary O(N) cost if fast object checks (like `body.tools`) would immediately cause an early return.
 **Action:** Defer extracting or aggregating text components from complex JSON bodies until all fast, metadata-based preconditions are evaluated, effectively turning an O(N) operation into O(1) on certain paths.
+## 2025-02-12 - Fast structural preconditions for regex in streams
+**Learning:** Eagerly running complex regular expressions (like those for LLM tool extraction) on raw, potentially massive request bodies or chunks of text streams can cause significant CPU spikes and block the Node.js Event Loop.
+**Action:** Always check fast structural preconditions (e.g. `!text.includes('<')`) before executing expensive regular expressions on streaming text paths to achieve massive speedups on non-matching strings.
