@@ -1,0 +1,4 @@
+## 2025-02-14 - Fix length-based timing attack in authorization
+**Vulnerability:** The codebase implemented constant-time string comparison for authorization tokens using `timingSafeEqual`, but the implementation early-returned if the token lengths did not match (i.e. `x.length===y.length && timingSafeEqual(x,y)`). This exposes the actual secret token's length through a timing attack because length mismatches return faster than matching lengths.
+**Learning:** Using `timingSafeEqual` does not prevent timing vulnerabilities if there are early returns based on length prior to the constant-time check. An attacker can iteratively guess the required length by measuring response times.
+**Prevention:** Ensure constant-time string comparisons always perform the same amount of work regardless of the input length by using a dummy comparison (e.g. comparing the target buffer against itself) when lengths don't match, while still returning false.
