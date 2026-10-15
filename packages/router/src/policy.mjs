@@ -6,7 +6,7 @@ export function orderRoutes(routes,stats={},options={}){
   const now=Date.now();
   const getScore = r => {
     const entry=rateLimited.get?.(r);
-    const cool=entry&&now-(entry.timestamp||now)<(Number(entry.retry_after)?Number(entry.retry_after)*1000:60000)?1:0;
+    const cool=entry&&(now-(entry.timestamp||(entry.observed_at?Date.parse(entry.observed_at):0)))<(Number(entry.retry_after)?Number(entry.retry_after)*1000:60000)?1:0;
     const s=stats[r]||{};
     const statScore=(s.success_rate??.75)*100-(s.rate_limit_rate||0)*60-Math.min(25,(s.p50_latency_ms||0)/1000);
     const bench=Number(benchmarkScores[r]||0);
