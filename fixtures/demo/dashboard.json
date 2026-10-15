@@ -24,18 +24,6 @@
       {"route":"openrouter/nvidia/nemotron-3-super-120b-a12b:free","role":"Fast High-Accuracy Peer","tier":"Super-120B","votes":4,"avg_rank":1.00,"wins":1},
       {"route":"nvidia/nvidia/nemotron-3-ultra-550b-a55b","role":"Frontier Reasoning Specialist","tier":"Ultra-550B","votes":4,"avg_rank":3.00,"wins":0},
       {"route":"tokenharbor/deepseek-v4-flash:free","role":"Lightweight Fast Reviewer","tier":"Flash-V4","votes":4,"avg_rank":3.75,"wins":0}
-    ],
-    "deliberations": [
-      {
-        "id": "deliberation-sqlite-postgres",
-        "created_at": "2026-10-15T14:31:00.000Z",
-        "title": "SQLite vs PostgreSQL for Lightweight Local Apps",
-        "query": "What are 2 advantages of using SQLite over PostgreSQL for lightweight local apps?",
-        "chairman": "copilot/gpt-4o",
-        "synthesis": "### Final Answer: 2 Advantages of SQLite for Lightweight Local Apps\n\n1. **Zero-Configuration, Serverless In-Process Architecture**: Runs directly inside your application without a separate database daemon or user/port management.\n2. **Single-File Portability**: The entire database is stored in a single cross-platform file, making backups, sharing, and sync effortless.",
-        "stage1_count": 4,
-        "models": ["copilot/gpt-4o","openrouter/nvidia/nemotron-3-super-120b-a12b:free","nvidia/nvidia/nemotron-3-ultra-550b-a55b","tokenharbor/deepseek-v4-flash:free"]
-      }
     ]
   },
   "automation": [{"job":"discovery","schedule":"Daily 04:10","last":{"status":"PASS","finished_at":"2026-08-10T04:10:12Z"}},{"job":"benchmark","schedule":"Sunday 04:40","last":{"status":"PASS","finished_at":"2026-08-09T04:42:03Z"}}],
