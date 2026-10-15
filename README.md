@@ -93,10 +93,11 @@ Each alias is an ordered verified-free fallback chain. A route is attempted only
 
 ## Integrations
 
-ZeroSpend exposes a standard OpenAI-compatible API base (`http://127.0.0.1:20129/v1`). You can drop it into any tool or IDE:
+ZeroSpend exposes both standard OpenAI-compatible (`/v1/chat/completions`) and native Anthropic Messages (`/v1/messages`) API endpoints. You can drop it into any tool, IDE, or desktop assistant:
 
 | Client | Base URL | Model | Guide |
 |---|---|---|---|
+| **Claude Desktop** | `http://127.0.0.1:20129/v1` | `claude-3-5-sonnet` / `claude-3-opus` | [Claude Desktop Guide](docs/integrations/claude-desktop.md) |
 | **Cursor** | `http://127.0.0.1:20129/v1` | `smart-free` / `free-code` | [Cursor Guide](docs/integrations/cursor-continue.md) |
 | **Continue (VS Code)** | `http://127.0.0.1:20129/v1` | `smart-free` / `free-fast` | [Continue Guide](docs/integrations/cursor-continue.md) |
 | **LibreChat** | `http://host.docker.internal:20129/v1` | `smart-free` | [LibreChat Guide](docs/integrations/librechat-openwebui.md) |
