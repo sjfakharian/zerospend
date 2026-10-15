@@ -17,3 +17,7 @@
 ## 2025-02-12 - Fast structural preconditions for regex in streams
 **Learning:** Eagerly running complex regular expressions (like those for LLM tool extraction) on raw, potentially massive request bodies or chunks of text streams can cause significant CPU spikes and block the Node.js Event Loop.
 **Action:** Always check fast structural preconditions (e.g. `!text.includes('<')`) before executing expensive regular expressions on streaming text paths to achieve massive speedups on non-matching strings.
+
+## 2024-10-11 - Double Array Filter vs Map/Dictionary vs For-Loop Optimization
+**Learning:** In V8, while single-pass dictionary/Map grouping avoids nested looping, a simple nested `for` loop over small arrays (e.g. `providers` array of size 5, `routes` array of size ~100) actually outperforms Map grouping and object dictionary grouping, while single-pass `for..of` iterations heavily outperform dual `Array.filter` calls that create intermediate arrays, likely due to avoiding V8 object/Map allocation and GC overhead in hot metadata loops.
+**Action:** When counting occurrences matching specific criteria in an array inside a `.map`, always prefer a single `for..of` or `for` loop that aggregates multiple counts in one pass rather than calling `.filter().length` repeatedly on the same array.
