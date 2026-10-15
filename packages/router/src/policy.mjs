@@ -12,7 +12,8 @@ export function orderRoutes(routes,stats={},options={}){
     const bench=Number(benchmarkScores[r]||0);
     const str=String(r||'').toLowerCase();
     let tier=0;
-    if(str.includes('ultra')||str.includes('550b')||str.includes('340b')||str.includes('gpt-6')||str.includes('deepseek-v4-pro'))tier=35;
+    if(str.includes('copilot')||str.includes('gpt-4o')||str.includes('gpt-4.1')||str.includes('claude-3-7')||str.includes('claude-3-5')||str.includes('sonnet'))tier=40;
+    else if(str.includes('ultra')||str.includes('550b')||str.includes('340b')||str.includes('gpt-6')||str.includes('deepseek-v4-pro'))tier=35;
     else if(str.includes('super')||str.includes('120b')||str.includes('deepseek-v4.1')||str.includes('deepseek-v4')||str.includes('mimo-v2.6-pro'))tier=25;
     else if(str.includes('lightning')||str.includes('70b')||str.includes('pro')||str.includes('coder')||str.includes('kimi'))tier=20;
     else if(str.includes('flash')||str.includes('30b')||str.includes('27b')||str.includes('qwen')||str.includes('glm'))tier=12;
