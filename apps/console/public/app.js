@@ -1,15 +1,47 @@
 const pages=[
-  ['Overview','⌂','Verified-free routing health, token usage, and live decisions.'],
-  ['Models & Routing','◇','Every production-eligible route and ordered fallback chains.'],
-  ['Benchmarks','⚡','Quota-efficient quality evaluations and category champions.'],
-  ['LLM Council','🏛️','Multi-model peer-review, consensus scoring, and chairman synthesis.'],
-  ['Providers','◎','Connection, credentials, and capacity status.'],
-  ['Safety & Settings','🛡️','Strict-free policy evidence, exclusions, and local endpoints.']
+  ['Overview','⌂','Verified-free routing health, token usage, and live decisions.','overview'],
+  ['Models & Routing','◇','Every production-eligible route and ordered fallback chains.','models'],
+  ['Benchmarks','⚡','Quota-efficient quality evaluations and category champions.','benchmarks'],
+  ['LLM Council','🏛️','Multi-model peer-review, consensus scoring, and chairman synthesis.','council'],
+  ['Providers','◎','Connection, credentials, and capacity status.','providers'],
+  ['Safety & Settings','🛡️','Strict-free policy evidence, exclusions, and local endpoints.','safety']
 ];
 const _legacyPages=['Live Routing','Models','Routing','Benchmarks','Usage','Performance','Providers','Safety','Automation','Settings','Council'];
-const nav=document.querySelector('#nav'),app=document.querySelector('#app'),toast=document.querySelector('#toast');let page=location.hash.slice(1)||'Overview',data,lastDataPayload='',csrfToken=null,modelQuery='',autoRefreshEnabled=true,refreshTimer=null,isFetching=false,requestedDemo=null,lastUpdated=null;
+function getPageFromHash(){
+  const raw=location.hash.slice(1);
+  if(!raw)return page||'Overview';
+  let decoded='';
+  try{decoded=decodeURIComponent(raw).trim()}catch{decoded=raw.trim()}
+  const lower=decoded.toLowerCase();
+  if(lower==='routing'||lower.includes('fallback')){
+    modelsTab='routing';
+    return 'Models & Routing';
+  }
+  if(lower==='models'||lower==='models-routing'){
+    modelsTab='models';
+    return 'Models & Routing';
+  }
+  if(lower==='settings'){
+    safetyTab='settings';
+    return 'Safety & Settings';
+  }
+  if(lower==='safety'||lower==='safety-settings'){
+    safetyTab='safety';
+    return 'Safety & Settings';
+  }
+  const clean=lower.replace(/[^a-z0-9]+/g,'');
+  if(clean.includes('model')||clean.includes('rout'))return 'Models & Routing';
+  if(clean.includes('safe')||clean.includes('sett'))return 'Safety & Settings';
+  if(clean.includes('council'))return 'LLM Council';
+  if(clean.includes('bench')||clean.includes('auto'))return 'Benchmarks';
+  if(clean.includes('prov'))return 'Providers';
+  if(clean.includes('over')||clean.includes('dash')||clean.includes('home'))return 'Overview';
+  const legacyMap={'Live Routing':'Overview','Usage':'Overview','Performance':'Overview','Models':'Models & Routing','Routing':'Models & Routing','Automation':'Benchmarks','Safety':'Safety & Settings','Settings':'Safety & Settings','Council':'LLM Council'};
+  return legacyMap[decoded]||decoded||'Overview';
+}
+const nav=document.querySelector('#nav'),app=document.querySelector('#app'),toast=document.querySelector('#toast');let page=getPageFromHash(),data,lastDataPayload='',csrfToken=null,modelQuery='',autoRefreshEnabled=true,refreshTimer=null,isFetching=false,requestedDemo=null,lastUpdated=null;
 function updateLastUpdated(){const el=document.querySelector('#last-updated');if(el)el.textContent=lastUpdated?`Updated ${lastUpdated.toLocaleTimeString()}`:'';}
-for(const [name,icon] of pages){const b=document.createElement('button');b.dataset.page=name;b.innerHTML=`<i>${icon}</i><span>${name}</span>`;b.onclick=()=>{page=name;location.hash=name;render();load(true)};nav.append(b)}
+for(const [name,icon,desc,slug] of pages){const b=document.createElement('button');b.dataset.page=name;b.innerHTML=`<i>${icon}</i><span>${name}</span>`;b.onclick=()=>{page=name;location.hash=slug;render()};nav.append(b)}
 const n=x=>Intl.NumberFormat('en',{notation:'compact',maximumFractionDigits:1}).format(x||0),num=x=>Intl.NumberFormat('en').format(x||0),ms=x=>x>=1000?`${(x/1000).toFixed(2)}s`:`${x||0}ms`,pct=x=>`${((x||0)*100).toFixed(1)}%`,esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])),date=x=>x?new Date(x).toLocaleString():'Never',badge=(v,tone='neutral')=>`<span class="badge ${tone}">${esc(v)}</span>`,card=(l,v,d='')=>`<article class="metric"><label>${l}</label><strong>${v}</strong>${d?`<small>${d}</small>`:''}</article>`,panel=(t,b,a='')=>`<article class="panel"><div class="panel-head"><h2>${t}</h2>${a}</div>${b}</article>`,empty=(t,d)=>`<div class="empty"><span>◇</span><h3>${t}</h3><p>${d}</p></div>`;
 const tableSortState=new Map();function table(headers,rows,tid=''){const sk=tid||`t${headers.map(h=>h[0]).join('')}`;if(!tableSortState.has(sk))tableSortState.set(sk,{col:null,dir:1});const st=tableSortState.get(sk);let sorted=[...rows];if(st.col!==null){const h=headers[st.col];sorted.sort((a,b)=>{const av=typeof h[1]==='function'?(h[2]!==undefined?a[h[2]]:null):a[h[1]]??'',bv=typeof h[1]==='function'?(h[2]!==undefined?b[h[2]]:null):b[h[1]]??'';if(av===null||bv===null)return 0;return(typeof av==='number'&&typeof bv==='number'?av-bv:String(av).localeCompare(String(bv),undefined,{numeric:true}))*st.dir})}return rows.length?`<div class="table-wrap"><table><thead><tr>${headers.map((h,i)=>`<th class="sortable-th${st.col===i?' sorted':''}" data-sk="${esc(sk)}" data-col="${i}" title="Sort by ${h[0]}">${h[0]}<span class="sort-icon">${st.col===i?(st.dir===1?'▲':'▼'):'⇅'}</span></th>`).join('')}</tr></thead><tbody>${sorted.map(r=>`<tr>${headers.map(h=>`<td>${typeof h[1]==='function'?h[1](r):esc(r[h[1]]??'—')}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`:empty('No records yet','Run discovery or send a request to populate this view.');}
 function announce(message,good=true){toast.textContent=message;toast.className=good?'show good':'show';setTimeout(()=>toast.className='',3500)}
@@ -200,8 +232,8 @@ function automation(){
 
 function councilView(){const c=data.council||{active_chairman:'copilot/gpt-4o',total_deliberations:0,council_models:[],deliberations:[]};const models=c.council_models||[];const deliberations=c.deliberations||[];const topWinner=models.length?[...models].sort((a,b)=>(a.avg_rank||99)-(b.avg_rank||99))[0]:null;const rosterTable=table([['Model',r=>`<button class="model-name" data-model="${esc(r.route)}">${esc(r.route.split('/').pop())}</button>`,'route'],['Council Role',r=>badge(r.role,r.role.includes('Chairman')?'green':'violet')],['Tier / Architecture',r=>esc(r.tier||'Frontier')],['Consensus Rank',r=>`<b>#${models.indexOf(r)+1}</b> (avg ${r.avg_rank?.toFixed(2)||'—'})`],['Peer Votes',r=>`${r.votes||0} votes`],['First-Place Wins',r=>badge(`${r.wins||0} wins`,r.wins>0?'green':'neutral')],['Cost Policy',r=>badge('VERIFIED FREE','green')]],models);const deliberationsHtml=deliberations.length?deliberations.map((d,idx)=>{const chairShort=d.chairman?d.chairman.split('/').pop():'copilot/gpt-4o';return `<article class="panel" style="margin-top:16px"><div class="panel-head"><div><span class="badge green" style="margin-right:8px">SESSION #${deliberations.length-idx}</span><strong style="font-size:15px;color:var(--text)">${esc(d.title||d.query.slice(0,60))}</strong></div><div style="display:flex;align-items:center;gap:8px"><span class="badge violet">👑 Chairman: ${esc(chairShort)}</span><small class="muted">${date(d.created_at)}</small></div></div><div style="padding:14px 18px;border-bottom:1px solid var(--line,#272e40);background:var(--subtle-bg,#161b26)"><p style="margin:0 0 6px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px">Deliberation Query / Question</p><p style="margin:0;font-size:13.5px;color:var(--text);line-height:1.5">"${esc(d.query)}"</p></div><div style="padding:16px 18px"><p style="margin:0 0 10px;font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:0.5px">👑 Chairman Final Synthesis (Consensus Output)</p><div style="background:var(--bg,#0e131f);border:1px solid var(--line,#272e40);border-radius:8px;padding:16px;font-size:13px;line-height:1.6;color:var(--text);white-space:pre-wrap;max-height:360px;overflow-y:auto;font-family:inherit">${esc(d.synthesis)}</div></div>${d.stage1&&d.stage1.length?`<details style="padding:12px 18px;border-top:1px solid var(--line,#272e40);cursor:pointer"><summary style="font-size:12px;font-weight:600;color:var(--muted)">🔍 View Stage 1 Individual Opinions &amp; Stage 2 Peer Reviews (${d.stage1.length} Models)</summary><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-top:12px">${d.stage1.map(s=>`<div style="background:var(--subtle-bg,#161b26);border:1px solid var(--line,#272e40);border-radius:6px;padding:12px"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><b style="font-size:12px;color:var(--text)">${esc(s.model.split('/').pop())}</b><span class="badge neutral">${s.response.split(/\\s+/).length} words</span></div><p style="font-size:12px;color:var(--muted);line-height:1.4;margin:0;max-height:120px;overflow:hidden;text-overflow:ellipsis">${esc(s.response.slice(0,240))}...</p></div>`).join('')}</div></details>`:''}</article>`}).join(''):empty('No deliberations yet','Run a deliberation session using the CLI: ./council "your question"');return `<section class="auto-hero"><div class="auto-hero-top"><div class="auto-hero-title"><h2><span>🏛️</span> LLM Council Deliberation &amp; Consensus Engine</h2><p>Karpathy-inspired 3-stage deliberation engine powered by ZeroSpend verified-free models ($0.00 spent): First opinions, anonymized peer-review ranking, and chairman synthesis.</p></div><div class="auto-actions"><span class="badge green" style="font-size:12px;padding:6px 12px">👑 Chairman: ${esc(c.active_chairman||'copilot/gpt-4o')}</span></div></div><div class="auto-stats"><div class="auto-stat-item"><label>Active Chairman</label><strong title="${esc(c.active_chairman)}">${esc(c.active_chairman.split('/').pop())}</strong><span class="stat-detail">Azure / Copilot GPT-4o</span></div><div class="auto-stat-item"><label>Council Roster</label><strong>${models.length} Models</strong><span class="stat-detail">Multi-Provider Quorum</span></div><div class="auto-stat-item"><label>Consensus Leader</label><strong title="${esc(topWinner?.route||'—')}">${esc(topWinner?.route?.split('/')?.pop()||'Nemotron 120B')}</strong><span class="stat-detail">Avg Rank #${topWinner?.avg_rank?.toFixed(1)||'1.0'}</span></div><div class="auto-stat-item"><label>Deliberations</label><strong>${c.total_deliberations||1} Sessions</strong><span class="stat-detail">Recorded in Council Vault</span></div><div class="auto-stat-item"><label>Deliberation Cost</label><strong style="color:var(--green)">$0.00 Zero Cost</strong><span class="stat-detail" style="color:var(--green)">100% Verified Free</span></div></div></section>${panel('Council Member Roster &amp; Consensus Standings',rosterTable)}<div style="margin-top:20px"><div class="panel-head" style="margin-bottom:8px"><h2>Recent Council Deliberations &amp; Chairman Syntheses</h2><span class="muted">Live outputs from ./council CLI &amp; Web App</span></div>${deliberationsHtml}</div>`}
 let modelsTab='models',safetyTab='safety';
-function setModelsTab(t){modelsTab=t;globalThis.modelsTab=t;render()}
-function setSafetyTab(t){safetyTab=t;globalThis.safetyTab=t;render()}
+function setModelsTab(t){modelsTab=t;globalThis.modelsTab=t;location.hash=t==='routing'?'routing':'models';render()}
+function setSafetyTab(t){safetyTab=t;globalThis.safetyTab=t;location.hash=t==='settings'?'settings':'safety';render()}
 globalThis.modelsTab=modelsTab;globalThis.safetyTab=safetyTab;
 globalThis.setModelsTab=setModelsTab;globalThis.setSafetyTab=setSafetyTab;
 function modelsAndRouting(){
@@ -219,19 +251,8 @@ function safetyAndSettings(){
 }
 function render(){
   if(!data)return;
-  const legacyMap={'Live Routing':'Overview','Usage':'Overview','Performance':'Overview','Models':'Models & Routing','Routing':'Models & Routing','Automation':'Benchmarks','Safety':'Safety & Settings','Settings':'Safety & Settings','Council':'LLM Council'};
-  if(page==='Routing'||location.hash.toLowerCase().includes('routing')||location.hash.toLowerCase().includes('fallback')){
-    modelsTab='routing';
-  }else if(page==='Models'){
-    modelsTab='models';
-  }
-  if(page==='Settings'||location.hash.toLowerCase().includes('setting')){
-    safetyTab='settings';
-  }else if(page==='Safety'){
-    safetyTab='safety';
-  }
-  const targetPage=legacyMap[page]||page;
-  const meta=pages.find(x=>x[0]===targetPage)||pages[0];
+  page=getPageFromHash();
+  const meta=pages.find(x=>x[0]===page)||pages[0];
   page=meta[0];
   document.querySelector('#title').textContent=page;
   document.querySelector('#subtitle').textContent=meta[2];
@@ -250,7 +271,7 @@ document.querySelector('#open-nav').onclick=()=>document.querySelector('#sidebar
 const refreshBtn=document.querySelector('#refresh-btn');if(refreshBtn)refreshBtn.onclick=()=>{load(false);announce('Refreshing live metadata...',true)};
 const autoBtn=document.querySelector('#auto-btn');if(autoBtn){autoBtn.onclick=()=>{autoRefreshEnabled=!autoRefreshEnabled;autoBtn.style.color=autoRefreshEnabled?'var(--green)':'var(--muted)';const modeEl=document.querySelector('#mode');if(modeEl&&data?.demo===false)modeEl.innerHTML=`<span class="status-dot ${autoRefreshEnabled?'pulse':''}"></span> LIVE METADATA${autoRefreshEnabled?' <small>· 3s</small>':''}`;announce(autoRefreshEnabled?'Auto-refresh enabled (every 3s)':'Auto-refresh paused',true)};autoBtn.style.color='var(--green)'}
 const modeBtn=document.querySelector('#mode');if(modeBtn)modeBtn.onclick=()=>{requestedDemo=data?.demo===false?true:false;lastDataPayload='';announce(requestedDemo?'Switched to synthetic demo mode':'Switched to live metadata mode',true);load(false)};
-globalThis.render=render;globalThis.providerAction=providerAction;globalThis.runAutomationJob=runAutomationJob;globalThis.discoverAll=discoverAll;globalThis.startLiveBenchmark=startLiveBenchmark;globalThis.setBenchmarkCategoryFilter=c=>{benchmarkCategoryFilter=c;render()};globalThis.setSortCol=(sk,col)=>{const st=tableSortState.get(sk)||{col:null,dir:1};tableSortState.set(sk,{col,dir:st.col===col?-st.dir:1});render()};addEventListener('hashchange',()=>{page=location.hash.slice(1)||'Overview';render()});
+globalThis.render=render;globalThis.providerAction=providerAction;globalThis.runAutomationJob=runAutomationJob;globalThis.discoverAll=discoverAll;globalThis.startLiveBenchmark=startLiveBenchmark;globalThis.setBenchmarkCategoryFilter=c=>{benchmarkCategoryFilter=c;render()};globalThis.setSortCol=(sk,col)=>{const st=tableSortState.get(sk)||{col:null,dir:1};tableSortState.set(sk,{col,dir:st.col===col?-st.dir:1});render()};addEventListener('hashchange',()=>{page=getPageFromHash();render()});
 function initAutoRefresh(){if(refreshTimer)clearInterval(refreshTimer);refreshTimer=setInterval(()=>{if(!autoRefreshEnabled||document.hidden)return;const dialog=document.querySelector('#model-dialog');if(dialog&&dialog.open)return;const active=document.activeElement;if(active&&(active.tagName==='INPUT'||active.tagName==='TEXTAREA'))return;load(true)},3000)}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&autoRefreshEnabled)load(true)});
 initAutoRefresh();load();
