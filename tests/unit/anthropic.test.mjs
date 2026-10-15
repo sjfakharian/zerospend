@@ -196,3 +196,20 @@ test('supports claude model names and retains them in response', ()=>{
   assert.equal(anthropicRes.model, 'claude-3-5-sonnet');
   assert.equal(anthropicRes.content[0].text, 'Hi there!');
 });
+
+test('supports claude-council model and retains identity in response', ()=>{
+  const anthropicBody = {
+    model: 'claude-council',
+    messages: [{ role: 'user', content: 'Council synthesis request' }]
+  };
+  const openAi = anthropicToOpenAIPayload(anthropicBody);
+  assert.equal(openAi.model, 'claude-council');
+
+  const openAiRes = {
+    choices: [{ message: { content: 'Chairman synthesis: verified consensus reached.' }, finish_reason: 'stop' }],
+    usage: { prompt_tokens: 25, completion_tokens: 8 }
+  };
+  const anthropicRes = openAIToAnthropicResponse(openAiRes, 'claude-council', 'test-uuid-council');
+  assert.equal(anthropicRes.model, 'claude-council');
+  assert.equal(anthropicRes.content[0].text, 'Chairman synthesis: verified consensus reached.');
+});
