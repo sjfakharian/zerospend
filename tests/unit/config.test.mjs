@@ -20,7 +20,8 @@ test('defaults returns expected configuration', () => {
       'free-tools': [],
       'free-fast': [],
       'free-long-context': [],
-      'free-structured': []
+      'free-structured': [],
+      'free-council': []
     }
   });
 });
