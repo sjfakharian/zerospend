@@ -6,13 +6,14 @@ export function orderRoutes(routes,stats={},options={}){
   const now=Date.now();
   const getScore = r => {
     const entry=rateLimited.get?.(r);
-    const cool=entry&&now-(entry.timestamp||now)<(Number(entry.retry_after)?Number(entry.retry_after)*1000:60000)?1:0;
+    const cool=entry&&(now-(entry.timestamp||(entry.observed_at?Date.parse(entry.observed_at):0)))<(Number(entry.retry_after)?Number(entry.retry_after)*1000:60000)?1:0;
     const s=stats[r]||{};
     const statScore=(s.success_rate??.75)*100-(s.rate_limit_rate||0)*60-Math.min(25,(s.p50_latency_ms||0)/1000);
     const bench=Number(benchmarkScores[r]||0);
     const str=String(r||'').toLowerCase();
     let tier=0;
-    if(str.includes('ultra')||str.includes('550b')||str.includes('340b')||str.includes('gpt-6')||str.includes('deepseek-v4-pro'))tier=35;
+    if(str.includes('copilot')||str.includes('gpt-4o')||str.includes('gpt-4.1')||str.includes('claude-3-7')||str.includes('claude-3-5')||str.includes('sonnet'))tier=40;
+    else if(str.includes('ultra')||str.includes('550b')||str.includes('340b')||str.includes('gpt-6')||str.includes('deepseek-v4-pro'))tier=35;
     else if(str.includes('super')||str.includes('120b')||str.includes('deepseek-v4.1')||str.includes('deepseek-v4')||str.includes('mimo-v2.6-pro'))tier=25;
     else if(str.includes('lightning')||str.includes('70b')||str.includes('pro')||str.includes('coder')||str.includes('kimi'))tier=20;
     else if(str.includes('flash')||str.includes('30b')||str.includes('27b')||str.includes('qwen')||str.includes('glm'))tier=12;
