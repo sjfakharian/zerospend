@@ -10,11 +10,34 @@
   "aliases": {"free-code":["openrouter/demo-coder:free","opencode/demo-tools-free"],"free-sql":["nvidia/demo-reasoner","openrouter/demo-coder:free"],"free-reasoning":["nvidia/demo-reasoner"],"free-general":["openrouter/demo-coder:free"],"free-tools":["opencode/demo-tools-free","openrouter/demo-coder:free"],"free-fast":["opencode/demo-tools-free"],"free-long-context":["nvidia/demo-reasoner"],"free-structured":["openrouter/demo-coder:free"]},
   "benchmark": {"benchmarked_at":"2026-08-09T04:40:00Z","records":[{"category":"code","route":"openrouter/demo-coder:free","score":94.5,"latency_ms":1180,"reliability":0.98,"tool_correct":true},{"category":"tools","route":"opencode/demo-tools-free","score":92.1,"latency_ms":890,"reliability":0.97,"tool_correct":true},{"category":"reasoning","route":"nvidia/demo-reasoner","score":96.2,"latency_ms":2040,"reliability":0.99,"tool_correct":true}]},
   "providers": [
+    {"name":"copilot","label":"GitHub Copilot","configured":true,"connection_status":"PASS","capacity_status":"AVAILABLE","verified_free_models":3,"production_eligible_models":3,"last_discovery":"2026-08-10 04:10 UTC","last_error_class":null,"eligible":1,"requests":92},
     {"name":"openrouter","label":"OpenRouter","configured":true,"connection_status":"PASS","capacity_status":"AVAILABLE","verified_free_models":7,"production_eligible_models":3,"last_discovery":"2026-08-10 04:10 UTC","last_error_class":null,"eligible":1,"requests":78},
     {"name":"opencode-free","label":"OpenCode Free + 9Router","configured":true,"connection_status":"PASS","capacity_status":"AVAILABLE (OBSERVED)","verified_free_models":7,"production_eligible_models":1,"last_discovery":"2026-08-10 04:10 UTC","last_error_class":null,"experimental":true,"eligible":1,"requests":41},
     {"name":"nvidia","label":"NVIDIA NIM","configured":true,"connection_status":"PASS","capacity_status":"AVAILABLE","verified_free_models":4,"production_eligible_models":2,"last_discovery":"2026-08-10 04:10 UTC","last_error_class":null,"eligible":1,"requests":65},
     {"name":"omniroute","label":"OmniRoute","configured":false,"connection_status":"NOT CONFIGURED","capacity_status":"NOT TESTED","verified_free_models":0,"production_eligible_models":0,"last_discovery":null,"last_error_class":null,"eligible":0,"requests":0}
   ],
+  "council": {
+    "active_chairman": "copilot/gpt-4o",
+    "total_deliberations": 1,
+    "council_models": [
+      {"route":"copilot/gpt-4o","role":"Chairman & Council Member","tier":"Tier-1 Frontier","votes":4,"avg_rank":2.25,"wins":0},
+      {"route":"openrouter/nvidia/nemotron-3-super-120b-a12b:free","role":"Fast High-Accuracy Peer","tier":"Super-120B","votes":4,"avg_rank":1.00,"wins":1},
+      {"route":"nvidia/nvidia/nemotron-3-ultra-550b-a55b","role":"Frontier Reasoning Specialist","tier":"Ultra-550B","votes":4,"avg_rank":3.00,"wins":0},
+      {"route":"tokenharbor/deepseek-v4-flash:free","role":"Lightweight Fast Reviewer","tier":"Flash-V4","votes":4,"avg_rank":3.75,"wins":0}
+    ],
+    "deliberations": [
+      {
+        "id": "deliberation-sqlite-postgres",
+        "created_at": "2026-10-15T14:31:00.000Z",
+        "title": "SQLite vs PostgreSQL for Lightweight Local Apps",
+        "query": "What are 2 advantages of using SQLite over PostgreSQL for lightweight local apps?",
+        "chairman": "copilot/gpt-4o",
+        "synthesis": "### Final Answer: 2 Advantages of SQLite for Lightweight Local Apps\n\n1. **Zero-Configuration, Serverless In-Process Architecture**: Runs directly inside your application without a separate database daemon or user/port management.\n2. **Single-File Portability**: The entire database is stored in a single cross-platform file, making backups, sharing, and sync effortless.",
+        "stage1_count": 4,
+        "models": ["copilot/gpt-4o","openrouter/nvidia/nemotron-3-super-120b-a12b:free","nvidia/nvidia/nemotron-3-ultra-550b-a55b","tokenharbor/deepseek-v4-flash:free"]
+      }
+    ]
+  },
   "automation": [{"job":"discovery","schedule":"Daily 04:10","last":{"status":"PASS","finished_at":"2026-08-10T04:10:12Z"}},{"job":"benchmark","schedule":"Sunday 04:40","last":{"status":"PASS","finished_at":"2026-08-09T04:42:03Z"}}],
   "events": [
     {"timestamp":"2026-08-10T12:01:20Z","request_id":"demo-exhausted-capacity","client":"Hermes","category":"sql","alias":"free-sql","backend":null,"provider":null,"model":null,"status":503,"latency_ms":860,"prompt_tokens":null,"completion_tokens":null,"total_tokens":null,"success":0,"error_class":"temporary_free_capacity_unavailable","fallback_depth":2,"attempts":2,"rate_limited":1,"tool_requested":0,"tool_success":0,"zero_cost_verified":1},
