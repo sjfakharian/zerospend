@@ -3,7 +3,14 @@ import {randomUUID} from 'node:crypto';
 export function anthropicToOpenAIPayload(body={}){
   const messages=[];
   if(body.system){
-    const sysText=typeof body.system==='string'?body.system:Array.isArray(body.system)?body.system.map(b=>b.text||'').join('\n'):String(body.system||'');
+    let sysText='';
+    if(typeof body.system==='string')sysText=body.system;
+    else if(Array.isArray(body.system)){
+      for(let i=0;i<body.system.length;i++){
+        if(i>0)sysText+='\n';
+        sysText+=body.system[i].text||'';
+      }
+    }else sysText=String(body.system||'');
     if(sysText.trim())messages.push({role:'system',content:sysText});
   }
   if(Array.isArray(body.messages)){
@@ -56,10 +63,18 @@ export function anthropicToOpenAIPayload(body={}){
             if(typeof b==='string')textBlocks.push(b);
             else if(b.type==='text'&&b.text)textBlocks.push(b.text);
             else if(b.type==='tool_result'){
+              let trContent='';
+              if(typeof b.content==='string')trContent=b.content;
+              else if(Array.isArray(b.content)){
+                for(let i=0;i<b.content.length;i++){
+                  if(i>0)trContent+='\n';
+                  trContent+=b.content[i].text||JSON.stringify(b.content[i]);
+                }
+              }else trContent=JSON.stringify(b.content||'');
               toolResults.push({
                 role:'tool',
                 tool_call_id:b.tool_use_id,
-                content:typeof b.content==='string'?b.content:Array.isArray(b.content)?b.content.map(c=>c.text||JSON.stringify(c)).join('\n'):JSON.stringify(b.content||'')
+                content:trContent
               });
             }
           }
