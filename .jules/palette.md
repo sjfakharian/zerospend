@@ -1,0 +1,3 @@
+## 2026-10-18 - Add interactive keyboard accessibility and focus states
+**Learning:** Custom interactive elements (like sortable table headers or custom toggle spans) must be built with standard accessibility primitives (tabindex="0", proper ARIA roles, and keyboard event handlers) since they don't inherit them natively like <button> or <a>. Furthermore, global :focus-visible outlines are essential for keyboard navigation visibility.
+**Action:** Always provide `tabindex="0"`, keyboard event handlers (for Enter/Space), and semantic roles (like `role="button"` or `role="switch"`) when creating custom interactive elements, and ensure global focus states are visible.
