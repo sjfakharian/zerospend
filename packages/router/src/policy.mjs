@@ -1,10 +1,41 @@
 export function isVerifiedFree(route,inventory){const proof=inventory?.routes?.[route];return proof?.zero_cost===true&&proof?.available===true&&proof?.production_eligible!==false}
-export function validateConfig(config,inventory){if(config?.zero_cost_policy!=="strict")throw Error("strict zero-cost policy required");for(const [alias,routes] of Object.entries(config.aliases||{})){if(!alias.startsWith("free-")||!Array.isArray(routes))throw Error(`invalid alias: ${alias}`);for(const route of routes)if(!isVerifiedFree(route,inventory))throw Error(`unverified route rejected: ${route}`)}return true}
-export function capacityHealth(config,inventory){validateConfig(config,inventory);const aliases=config.aliases||{},empty_aliases=Object.entries(aliases).filter(([,routes])=>routes.length===0).map(([alias])=>alias),proofs=Object.values(inventory?.routes||{}),paid_routes=proofs.filter(route=>route.production_eligible&&route.zero_cost!==true).length,unverified_routes=proofs.filter(route=>route.production_eligible&&!isVerifiedFree(route.route,inventory)).length;return {status:empty_aliases.length?'degraded':'ok',strict_free:true,paid_routes,unverified_routes,empty_aliases}}
+export function validateConfig(config,inventory){
+  if(config?.zero_cost_policy!=="strict")throw Error("strict zero-cost policy required");
+  const aliases = config.aliases || {};
+  for (const alias in aliases) {
+    if (!alias.startsWith("free-") || !Array.isArray(aliases[alias])) throw Error(`invalid alias: ${alias}`);
+    const routes = aliases[alias];
+    for (let i = 0; i < routes.length; i++) {
+      if (!isVerifiedFree(routes[i], inventory)) throw Error(`unverified route rejected: ${routes[i]}`);
+    }
+  }
+  return true;
+}
+export function capacityHealth(config,inventory){
+  validateConfig(config,inventory);
+  const aliases=config.aliases||{};
+  const empty_aliases=[];
+  for(const alias in aliases){
+    if(aliases[alias].length===0)empty_aliases.push(alias);
+  }
+  let paid_routes=0;
+  let unverified_routes=0;
+  const routes = inventory?.routes || {};
+  for(const routeId in routes){
+    const route=routes[routeId];
+    if(route.production_eligible){
+      if(route.zero_cost!==true)paid_routes++;
+      if(!isVerifiedFree(route.route || routeId,inventory))unverified_routes++;
+    }
+  }
+  return {status:empty_aliases.length?'degraded':'ok',strict_free:true,paid_routes,unverified_routes,empty_aliases};
+}
 export function orderRoutes(routes,stats={},options={}){
   const rateLimited=options.rateLimited||new Map(),benchmarkScores=options.benchmarkScores||{},category=options.category||'';
   const now=Date.now();
-  const getScore = r => {
+  const scoredRoutes = new Array(routes.length);
+  for(let i=0; i<routes.length; i++) {
+    const r = routes[i];
     const entry=rateLimited.get?.(r);
     const cool=entry&&(now-(entry.timestamp||(entry.observed_at?Date.parse(entry.observed_at):0)))<(Number(entry.retry_after)?Number(entry.retry_after)*1000:60000)?1:0;
     const s=stats[r]||{};
@@ -18,10 +49,15 @@ export function orderRoutes(routes,stats={},options={}){
     else if(str.includes('lightning')||str.includes('70b')||str.includes('pro')||str.includes('coder')||str.includes('kimi'))tier=20;
     else if(str.includes('flash')||str.includes('30b')||str.includes('27b')||str.includes('qwen')||str.includes('glm'))tier=12;
     else if(str.includes('2.6b')||str.includes('2b')||str.includes('mini')||str.includes('note-preview'))tier=category==='fast'?15:-10;
-    return { cool, score: statScore + bench + tier, route: r };
-  };
-  return [...routes].map(getScore).sort((a,b)=>{
+    scoredRoutes[i] = { cool, score: statScore + bench + tier, route: r };
+  }
+  scoredRoutes.sort((a,b)=>{
     if(a.cool!==b.cool)return a.cool-b.cool;
     return b.score-a.score;
-  }).map(x=>x.route);
+  });
+  const result = new Array(scoredRoutes.length);
+  for(let i=0; i<scoredRoutes.length; i++){
+    result[i] = scoredRoutes[i].route;
+  }
+  return result;
 }
