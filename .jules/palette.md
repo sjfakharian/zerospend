@@ -1,0 +1,3 @@
+## 2026-10-21 - Keyboard Accessibility on Non-Button Interactive Elements
+**Learning:** When making non-button DOM elements (like `<span>` or `<th>`) interactive in vanilla HTML/JS, they require explicit `tabindex="0"` and semantic ARIA roles (e.g. `role="button"`) to be focusable and discoverable by screen readers, along with explicit `keydown` event listeners (for 'Enter' and 'Space') to trigger their associated click handlers.
+**Action:** Ensure any non-button element with an `onclick` handler also receives `tabindex="0"`, an appropriate `role`, and an `onkeydown` handler for keyboard activation.
