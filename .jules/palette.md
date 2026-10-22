@@ -1,0 +1,3 @@
+## 2024-10-22 - Vanilla JS Table Header Accessibility
+**Learning:** In vanilla JS apps using raw template literals for DOM generation (like this console), interactive elements such as table headers (`<th>`) often lack native keyboard focus and interaction semantics compared to React/framework components. Click handlers alone on `<th>` are not accessible.
+**Action:** When adding interactivity to non-button DOM elements (like `<th>`) in raw JS template literals, explicitly add `tabindex="0"`, `role="button"`, and `ARIA` attributes, and bind a `keydown` event listener to handle `Enter` and `Space` keys to mirror click functionality.
