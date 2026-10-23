@@ -21,3 +21,6 @@
 ## 2024-10-11 - Double Array Filter vs Map/Dictionary vs For-Loop Optimization
 **Learning:** In V8, while single-pass dictionary/Map grouping avoids nested looping, a simple nested `for` loop over small arrays (e.g. `providers` array of size 5, `routes` array of size ~100) actually outperforms Map grouping and object dictionary grouping, while single-pass `for..of` iterations heavily outperform dual `Array.filter` calls that create intermediate arrays, likely due to avoiding V8 object/Map allocation and GC overhead in hot metadata loops.
 **Action:** When counting occurrences matching specific criteria in an array inside a `.map`, always prefer a single `for..of` or `for` loop that aggregates multiple counts in one pass rather than calling `.filter().length` repeatedly on the same array.
+## 2023-10-23 - Optimize aggregate metrics computation over arrays
+**Learning:** Using multiple `.reduce()`, `.map()`, and `.filter()` calls to compute aggregate metrics over an array of events creates O(M*N) overhead and numerous intermediate array allocations causing GC pauses.
+**Action:** Replace functional array method chains with a single `for` loop pass to accumulate all aggregate values simultaneously on proven hot paths.
