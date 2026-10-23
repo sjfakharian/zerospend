@@ -20,8 +20,13 @@ export function orderRoutes(routes,stats={},options={}){
     else if(str.includes('2.6b')||str.includes('2b')||str.includes('mini')||str.includes('note-preview'))tier=category==='fast'?15:-10;
     return { cool, score: statScore + bench + tier, route: r };
   };
-  return [...routes].map(getScore).sort((a,b)=>{
+  // Optimized: Pre-allocate array and use single-pass loops instead of chained .map() to reduce garbage collection overhead on routing hot path.
+  const scored = new Array(routes.length);
+  for(let i=0;i<routes.length;i++) scored[i] = getScore(routes[i]);
+  scored.sort((a,b)=>{
     if(a.cool!==b.cool)return a.cool-b.cool;
     return b.score-a.score;
-  }).map(x=>x.route);
+  });
+  for(let i=0;i<routes.length;i++) scored[i] = scored[i].route;
+  return scored;
 }
