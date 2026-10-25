@@ -1,0 +1,3 @@
+## 2025-02-15 - Missing Keyboard Support on Non-Button Interactive Elements
+**Learning:** In the vanilla JS frontend of this app, interactivity is sometimes added to `<span>` or `<th>` elements without native keyboard focus (`tabindex`) or semantic roles, leading to a loss of accessibility for non-mouse users. The vanilla JS template literals also omit `keydown` listeners for these interactive elements.
+**Action:** Always ensure that non-button interactive DOM elements explicitly receive `tabindex="0"`, semantic ARIA roles (`role="button"`), and `keydown` event listeners covering 'Enter' and 'Space' when augmenting vanilla JS components.
