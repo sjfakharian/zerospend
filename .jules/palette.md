@@ -1,0 +1,3 @@
+## 2025-01-08 - Keyboard Accessibility for Non-Button Elements
+**Learning:** In the vanilla JS frontend, interactive DOM elements that are not native `<button>`s (like the `<th>` table headers for sorting and the `<span>` for toggling live/demo mode) require manual intervention to be keyboard accessible. Users relying on keyboard navigation (e.g., using Tab to focus and Enter/Space to interact) cannot use these features otherwise.
+**Action:** When adding interactivity to non-button DOM elements (like `<span>` or `<th>`), ensure keyboard accessibility by explicitly adding `tabindex="0"`, semantic ARIA roles like `role="button"`, and `keydown` event handlers for 'Enter' and 'Space'.
