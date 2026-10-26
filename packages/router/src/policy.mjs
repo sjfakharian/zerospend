@@ -1,6 +1,24 @@
 export function isVerifiedFree(route,inventory){const proof=inventory?.routes?.[route];return proof?.zero_cost===true&&proof?.available===true&&proof?.production_eligible!==false}
 export function validateConfig(config,inventory){if(config?.zero_cost_policy!=="strict")throw Error("strict zero-cost policy required");for(const [alias,routes] of Object.entries(config.aliases||{})){if(!alias.startsWith("free-")||!Array.isArray(routes))throw Error(`invalid alias: ${alias}`);for(const route of routes)if(!isVerifiedFree(route,inventory))throw Error(`unverified route rejected: ${route}`)}return true}
-export function capacityHealth(config,inventory){validateConfig(config,inventory);const aliases=config.aliases||{},empty_aliases=Object.entries(aliases).filter(([,routes])=>routes.length===0).map(([alias])=>alias),proofs=Object.values(inventory?.routes||{}),paid_routes=proofs.filter(route=>route.production_eligible&&route.zero_cost!==true).length,unverified_routes=proofs.filter(route=>route.production_eligible&&!isVerifiedFree(route.route,inventory)).length;return {status:empty_aliases.length?'degraded':'ok',strict_free:true,paid_routes,unverified_routes,empty_aliases}}
+export function capacityHealth(config,inventory){
+validateConfig(config,inventory);
+const aliases=config.aliases||{},empty_aliases=[];
+// ⚡ Bolt Opt: Single-pass for loop over alias keys to avoid .filter().map() allocation
+for(const alias of Object.keys(aliases)){
+  if(aliases[alias].length===0)empty_aliases.push(alias);
+}
+let paid_routes=0,unverified_routes=0;
+const proofs=Object.values(inventory?.routes||{});
+// ⚡ Bolt Opt: Single-pass for loop over proofs instead of multiple .filter().length passes to reduce GC overhead
+for(let i=0;i<proofs.length;i++){
+  const r=proofs[i];
+  if(r.production_eligible){
+    if(r.zero_cost!==true)paid_routes++;
+    if(!isVerifiedFree(r.route,inventory))unverified_routes++;
+  }
+}
+return {status:empty_aliases.length?'degraded':'ok',strict_free:true,paid_routes,unverified_routes,empty_aliases};
+}
 export function orderRoutes(routes,stats={},options={}){
   const rateLimited=options.rateLimited||new Map(),benchmarkScores=options.benchmarkScores||{},category=options.category||'';
   const now=Date.now();
