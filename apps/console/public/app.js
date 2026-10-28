@@ -97,7 +97,7 @@ function table(headers,rows,tid=''){
   return rows.length?`<div class="table-wrap"><table><thead><tr>${headers.map((h,i)=>{
     const isSorted=st.col===i;
     const arrow=isSorted?(st.dir===1?'▲':'▼'):'⇅';
-    return `<th class="sortable-th${isSorted?' sorted':''}" data-sk="${esc(sk)}" data-col="${i}" onclick="setSortCol('${esc(sk)}',${i})" title="Sort by ${esc(h[0])}">${esc(h[0])}<span class="sort-icon">${arrow}</span></th>`;
+    return `<th class="sortable-th${isSorted?' sorted':''}" data-sk="${esc(sk)}" data-col="${i}" role="button" tabindex="0" aria-sort="${isSorted?(st.dir===1?'ascending':'descending'):'none'}" onclick="setSortCol('${esc(sk)}',${i})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();setSortCol('${esc(sk)}',${i});}" title="Sort by ${esc(h[0])}">${esc(h[0])}<span class="sort-icon">${arrow}</span></th>`;
   }).join('')}</tr></thead><tbody>${sorted.map((r,rIdx)=>`<tr>${headers.map(h=>`<td>${typeof h[1]==='function'?h[1](r,rIdx):esc(r[h[1]]??'—')}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`:empty('No records yet','Run discovery or send a request to populate this view.');
 }
 function announce(message,good=true){toast.textContent=message;toast.className=good?'show good':'show';setTimeout(()=>toast.className='',3500)}
