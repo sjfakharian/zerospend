@@ -21,3 +21,7 @@
 ## 2024-10-11 - Double Array Filter vs Map/Dictionary vs For-Loop Optimization
 **Learning:** In V8, while single-pass dictionary/Map grouping avoids nested looping, a simple nested `for` loop over small arrays (e.g. `providers` array of size 5, `routes` array of size ~100) actually outperforms Map grouping and object dictionary grouping, while single-pass `for..of` iterations heavily outperform dual `Array.filter` calls that create intermediate arrays, likely due to avoiding V8 object/Map allocation and GC overhead in hot metadata loops.
 **Action:** When counting occurrences matching specific criteria in an array inside a `.map`, always prefer a single `for..of` or `for` loop that aggregates multiple counts in one pass rather than calling `.filter().length` repeatedly on the same array.
+
+## 2024-10-28 - Optimize telemetry aggregation hot path to O(N)
+**Learning:** When computing multiple aggregate metrics over large arrays in the ZeroSpend console, chained functional methods (`.reduce()`, `.map()`, `.filter()`) result in multiple O(N) iterations and high intermediate allocation.
+**Action:** On proven hot paths like event aggregation, use a single-pass `for` loop to accumulate all metrics simultaneously, minimizing garbage collection and achieving a ~2x performance speedup.
