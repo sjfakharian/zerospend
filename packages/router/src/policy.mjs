@@ -20,8 +20,21 @@ export function orderRoutes(routes,stats={},options={}){
     else if(str.includes('2.6b')||str.includes('2b')||str.includes('mini')||str.includes('note-preview'))tier=category==='fast'?15:-10;
     return { cool, score: statScore + bench + tier, route: r };
   };
-  return [...routes].map(getScore).sort((a,b)=>{
+  // Opt: Avoid intermediate array allocations and GC overhead on the routing hot path.
+  // We use a manual Schwartzian Transform with pre-allocated arrays (`new Array(len)`)
+  // and single-pass `for` loops instead of idiomatic chained `.map().sort().map()`.
+  const len = routes.length;
+  const scored = new Array(len);
+  for (let i = 0; i < len; i++) {
+    scored[i] = getScore(routes[i]);
+  }
+  scored.sort((a,b)=>{
     if(a.cool!==b.cool)return a.cool-b.cool;
     return b.score-a.score;
-  }).map(x=>x.route);
+  });
+  const sorted = new Array(len);
+  for (let i = 0; i < len; i++) {
+    sorted[i] = scored[i].route;
+  }
+  return sorted;
 }
