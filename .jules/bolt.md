@@ -21,3 +21,7 @@
 ## 2024-10-11 - Double Array Filter vs Map/Dictionary vs For-Loop Optimization
 **Learning:** In V8, while single-pass dictionary/Map grouping avoids nested looping, a simple nested `for` loop over small arrays (e.g. `providers` array of size 5, `routes` array of size ~100) actually outperforms Map grouping and object dictionary grouping, while single-pass `for..of` iterations heavily outperform dual `Array.filter` calls that create intermediate arrays, likely due to avoiding V8 object/Map allocation and GC overhead in hot metadata loops.
 **Action:** When counting occurrences matching specific criteria in an array inside a `.map`, always prefer a single `for..of` or `for` loop that aggregates multiple counts in one pass rather than calling `.filter().length` repeatedly on the same array.
+
+## 2025-03-05 - Avoid chained array methods on object keys/values for hot paths
+**Learning:** `capacityHealth` was computing system capacity stats using `Object.entries(aliases).filter(...).map(...)` and `Object.values(proofs).filter(...).length` on every invocation. This caused large numbers of intermediate arrays and garbage collection pressure when running against many aliases and routes.
+**Action:** Replace `Object.entries`, `Object.values`, `.filter`, and `.map` chains on hot paths with single-pass `for...in` loops to minimize intermediate allocations and GC overhead.
