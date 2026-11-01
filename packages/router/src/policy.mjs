@@ -1,6 +1,6 @@
 export function isVerifiedFree(route,inventory){const proof=inventory?.routes?.[route];return proof?.zero_cost===true&&proof?.available===true&&proof?.production_eligible!==false}
 export function validateConfig(config,inventory){if(config?.zero_cost_policy!=="strict")throw Error("strict zero-cost policy required");for(const [alias,routes] of Object.entries(config.aliases||{})){if(!alias.startsWith("free-")||!Array.isArray(routes))throw Error(`invalid alias: ${alias}`);for(const route of routes)if(!isVerifiedFree(route,inventory))throw Error(`unverified route rejected: ${route}`)}return true}
-export function capacityHealth(config,inventory){validateConfig(config,inventory);const aliases=config.aliases||{},empty_aliases=Object.entries(aliases).filter(([,routes])=>routes.length===0).map(([alias])=>alias),proofs=Object.values(inventory?.routes||{}),paid_routes=proofs.filter(route=>route.production_eligible&&route.zero_cost!==true).length,unverified_routes=proofs.filter(route=>route.production_eligible&&!isVerifiedFree(route.route,inventory)).length;return {status:empty_aliases.length?'degraded':'ok',strict_free:true,paid_routes,unverified_routes,empty_aliases}}
+export function capacityHealth(config,inventory){validateConfig(config,inventory);const aliases=config.aliases||{},proofs=Object.values(inventory?.routes||{});let paid_routes=0,unverified_routes=0;for(const route of proofs){if(route.production_eligible){if(route.zero_cost!==true)paid_routes++;if(!isVerifiedFree(route.route,inventory))unverified_routes++;}}const empty_aliases=[];for(const [alias,routes] of Object.entries(aliases)){if(routes.length===0)empty_aliases.push(alias);}return {status:empty_aliases.length?'degraded':'ok',strict_free:true,paid_routes,unverified_routes,empty_aliases}}
 export function orderRoutes(routes,stats={},options={}){
   const rateLimited=options.rateLimited||new Map(),benchmarkScores=options.benchmarkScores||{},category=options.category||'';
   const now=Date.now();
@@ -20,8 +20,17 @@ export function orderRoutes(routes,stats={},options={}){
     else if(str.includes('2.6b')||str.includes('2b')||str.includes('mini')||str.includes('note-preview'))tier=category==='fast'?15:-10;
     return { cool, score: statScore + bench + tier, route: r };
   };
-  return [...routes].map(getScore).sort((a,b)=>{
+  const mapped=[];
+  for(let i=0;i<routes.length;i++){
+    mapped.push(getScore(routes[i]));
+  }
+  mapped.sort((a,b)=>{
     if(a.cool!==b.cool)return a.cool-b.cool;
     return b.score-a.score;
-  }).map(x=>x.route);
+  });
+  const result=[];
+  for(let i=0;i<mapped.length;i++){
+    result.push(mapped[i].route);
+  }
+  return result;
 }

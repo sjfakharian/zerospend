@@ -21,3 +21,11 @@
 ## 2024-10-11 - Double Array Filter vs Map/Dictionary vs For-Loop Optimization
 **Learning:** In V8, while single-pass dictionary/Map grouping avoids nested looping, a simple nested `for` loop over small arrays (e.g. `providers` array of size 5, `routes` array of size ~100) actually outperforms Map grouping and object dictionary grouping, while single-pass `for..of` iterations heavily outperform dual `Array.filter` calls that create intermediate arrays, likely due to avoiding V8 object/Map allocation and GC overhead in hot metadata loops.
 **Action:** When counting occurrences matching specific criteria in an array inside a `.map`, always prefer a single `for..of` or `for` loop that aggregates multiple counts in one pass rather than calling `.filter().length` repeatedly on the same array.
+
+## 2026-10-21 - Replace Functional Array Chains with For Loops on Hot Paths
+**Learning:** In the ZeroSpend router, functional array methods like `.map().sort().map()` and `.filter()` on hot paths (e.g., `orderRoutes`, `capacityHealth`, and `eligibleFallbacks`) introduce measurable overhead due to intermediate array allocations and garbage collection.
+**Action:** Replace these chained functional calls with single-pass `for` loops with manual array `.push()` operations on proven hot paths to avoid intermediate allocations.
+
+## 2026-10-21 - Replace Array Chains with For Loops on Router Hot Paths
+**Learning:** In the ZeroSpend router, functional array methods like `.map().sort().map()` and `.filter()` on high-frequency paths (e.g., `orderRoutes`, `capacityHealth`, and `eligibleFallbacks`) introduce measurable overhead from intermediate array allocations and garbage collection.
+**Action:** Replace these chained functional calls with single-pass `for` loops using manual array `.push()` operations on proven hot paths to avoid intermediate allocations and reduce GC pressure.
