@@ -20,8 +20,11 @@ export function orderRoutes(routes,stats={},options={}){
     else if(str.includes('2.6b')||str.includes('2b')||str.includes('mini')||str.includes('note-preview'))tier=category==='fast'?15:-10;
     return { cool, score: statScore + bench + tier, route: r };
   };
-  return [...routes].map(getScore).sort((a,b)=>{
-    if(a.cool!==b.cool)return a.cool-b.cool;
-    return b.score-a.score;
-  }).map(x=>x.route);
+  const len = routes.length;
+  const arr = new Array(len);
+  for (let i = 0; i < len; i++) arr[i] = getScore(routes[i]);
+  arr.sort((a,b) => a.cool !== b.cool ? a.cool - b.cool : b.score - a.score);
+  const res = new Array(len);
+  for (let i = 0; i < len; i++) res[i] = arr[i].route;
+  return res;
 }

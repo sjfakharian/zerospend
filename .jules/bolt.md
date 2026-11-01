@@ -21,3 +21,6 @@
 ## 2024-10-11 - Double Array Filter vs Map/Dictionary vs For-Loop Optimization
 **Learning:** In V8, while single-pass dictionary/Map grouping avoids nested looping, a simple nested `for` loop over small arrays (e.g. `providers` array of size 5, `routes` array of size ~100) actually outperforms Map grouping and object dictionary grouping, while single-pass `for..of` iterations heavily outperform dual `Array.filter` calls that create intermediate arrays, likely due to avoiding V8 object/Map allocation and GC overhead in hot metadata loops.
 **Action:** When counting occurrences matching specific criteria in an array inside a `.map`, always prefer a single `for..of` or `for` loop that aggregates multiple counts in one pass rather than calling `.filter().length` repeatedly on the same array.
+## 2024-11-01 - Optimizing Hot Path Array Chains
+**Learning:** In Node.js, idiomatic functional array chains like `.map().sort().map()` create unnecessary intermediate array allocations and overhead on hot paths.
+**Action:** Replace these chains with single-pass `for` loops and pre-allocated arrays (`new Array(length)`) to minimize garbage collection bottlenecks for zero-allocation performance on proven hot paths.
