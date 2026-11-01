@@ -33,3 +33,7 @@
 ## 2024-10-30 - Single-pass Metric Aggregation
 **Learning:** Chained array methods (`reduce`, `map`, `filter`) on hot paths in Node.js generate O(k*N) iteration overhead and create intermediate arrays, triggering excess garbage collection.
 **Action:** Use a single-pass `for` loop to compute multiple aggregates simultaneously on hot paths to minimize allocations and CPU time.
+
+## 2025-05-18 - Replacing Array methods in payload parsing
+**Learning:** When parsing Anthropic payload formats (which often include deeply nested array structures for text and tools), `.map().join()` and `.map` generate too many intermediate arrays, causing noticeable memory and GC overhead on hot paths.
+**Action:** Use pre-sized arrays for simple maps (`new Array(length)`) and standard `for` loops with manual string concatenation (`+=`) when coalescing text blocks to bypass the GC overhead entirely.
