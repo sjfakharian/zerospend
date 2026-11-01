@@ -29,3 +29,7 @@
 ## 2025-03-05 - Avoid chained array methods on object keys/values for hot paths
 **Learning:** `capacityHealth` was computing system capacity stats using `Object.entries(aliases).filter(...).map(...)` and `Object.values(proofs).filter(...).length` on every invocation. This caused large numbers of intermediate arrays and garbage collection pressure when running against many aliases and routes.
 **Action:** Replace `Object.entries`, `Object.values`, `.filter`, and `.map` chains on hot paths with single-pass `for...in` loops to minimize intermediate allocations and GC overhead.
+
+## 2024-10-30 - Single-pass Metric Aggregation
+**Learning:** Chained array methods (`reduce`, `map`, `filter`) on hot paths in Node.js generate O(k*N) iteration overhead and create intermediate arrays, triggering excess garbage collection.
+**Action:** Use a single-pass `for` loop to compute multiple aggregates simultaneously on hot paths to minimize allocations and CPU time.
