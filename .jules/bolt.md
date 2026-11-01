@@ -21,3 +21,7 @@
 ## 2024-10-11 - Double Array Filter vs Map/Dictionary vs For-Loop Optimization
 **Learning:** In V8, while single-pass dictionary/Map grouping avoids nested looping, a simple nested `for` loop over small arrays (e.g. `providers` array of size 5, `routes` array of size ~100) actually outperforms Map grouping and object dictionary grouping, while single-pass `for..of` iterations heavily outperform dual `Array.filter` calls that create intermediate arrays, likely due to avoiding V8 object/Map allocation and GC overhead in hot metadata loops.
 **Action:** When counting occurrences matching specific criteria in an array inside a `.map`, always prefer a single `for..of` or `for` loop that aggregates multiple counts in one pass rather than calling `.filter().length` repeatedly on the same array.
+
+## 2025-02-12 - Fast structural preconditions for regex in streaming extraction
+**Learning:** In the ZeroSpend router, eagerly running complex regular expressions on `pendingText` inside the streaming loop (e.g. `/<[|｜]?(?:DSML|tool)/i.test(pendingText)`) can cause significant Event Loop blocking and CPU overhead when dealing with large non-tool responses.
+**Action:** Always wrap these checks with a fast structural precondition like `pendingText.includes('<')` to bypass the regex entirely when the necessary character isn't even present.
