@@ -1,3 +1,3 @@
-## 2024-05-24 - Interactive non-button elements lack accessibility
-**Learning:** Table headers (`<th>`) and other non-button elements with `onclick` handlers in the vanilla JS frontend lack keyboard navigation (tabindex), semantic roles (role="columnheader"), ARIA state (aria-sort), and keyboard event handlers (Enter/Space), preventing screen reader and keyboard-only users from interacting with them.
-**Action:** When adding interactivity to non-button DOM elements like `<span>` or `<th>`, explicitly add `tabindex="0"`, semantic ARIA roles, and `keydown` event handlers for 'Enter' and 'Space' to ensure keyboard accessibility.
+## 2024-11-01 - Add keyboard support to interactive DOM elements
+**Learning:** Found an accessibility issue pattern where `<span>` elements handling click events to toggle modes in vanilla JS lacked keyboard support (e.g. `tabindex="0"`, `role="button"`, `keydown` events). Adding these improves accessibility.
+**Action:** When adding interactivity to non-button DOM elements like `<span>` in the vanilla JS frontend, ensure keyboard accessibility by explicitly adding `tabindex="0"`, `role="button"`, and `keydown` event handlers for 'Enter' and 'Space'.
