@@ -37,3 +37,7 @@
 ## 2025-05-18 - Replacing Array methods in payload parsing
 **Learning:** When parsing Anthropic payload formats (which often include deeply nested array structures for text and tools), `.map().join()` and `.map` generate too many intermediate arrays, causing noticeable memory and GC overhead on hot paths.
 **Action:** Use pre-sized arrays for simple maps (`new Array(length)`) and standard `for` loops with manual string concatenation (`+=`) when coalescing text blocks to bypass the GC overhead entirely.
+
+## 2025-06-25 - Single-pass Event Filtering vs Nested Map-Filter
+**Learning:** In the ZeroSpend Console server (`apps/console/server.mjs`), fetching routes generated an `O(N * M)` iteration spike due to executing `events.filter(...)` inside an `Object.values(routes).map(...)` when dealing with thousands of events.
+**Action:** When aggregating multiple one-to-many relationships (like routes to events and routes to benchmarks), avoid calling `.filter()` inside `.map()`. Instead, use a single-pass `for` loop to build a hash map (dictionary) of events keyed by ID/route, allowing O(1) lookups during the subsequent map operation.
