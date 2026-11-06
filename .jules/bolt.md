@@ -37,3 +37,7 @@
 ## 2025-05-18 - Replacing Array methods in payload parsing
 **Learning:** When parsing Anthropic payload formats (which often include deeply nested array structures for text and tools), `.map().join()` and `.map` generate too many intermediate arrays, causing noticeable memory and GC overhead on hot paths.
 **Action:** Use pre-sized arrays for simple maps (`new Array(length)`) and standard `for` loops with manual string concatenation (`+=`) when coalescing text blocks to bypass the GC overhead entirely.
+
+## 2025-05-18 - Replacing Array methods inside Map loops with Dictionary lookups
+**Learning:** In the ZeroSpend console, `data()` used nested `.filter()` inside an `Object.values(inventory.routes).map(...)` loop to aggregate metrics for each route. On datasets with 5,000 events and a large number of routes, this triggered O(R * E) redundant iterations, causing an Event Loop blocking spike.
+**Action:** Extract nested filtering and aggregation into a single upfront O(N) `for` loop that groups events and benchmarks by route into dictionary/hash maps. Then, perform O(1) lookups during the subsequent `map()` loop over routes.
