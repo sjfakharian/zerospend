@@ -37,3 +37,7 @@
 ## 2025-05-18 - Replacing Array methods in payload parsing
 **Learning:** When parsing Anthropic payload formats (which often include deeply nested array structures for text and tools), `.map().join()` and `.map` generate too many intermediate arrays, causing noticeable memory and GC overhead on hot paths.
 **Action:** Use pre-sized arrays for simple maps (`new Array(length)`) and standard `for` loops with manual string concatenation (`+=`) when coalescing text blocks to bypass the GC overhead entirely.
+
+## 2025-06-08 - Fast paths vs Chained Array operations
+**Learning:** Chained array methods like `[...routes].map(getScore).sort(...).map(...)` in functions executing multiple times or on hot paths like `orderRoutes` generate multiple O(N) array allocation overheads causing significant V8 garbage collection strain.
+**Action:** Unroll nested/chained functional `.map` methods into single pass pre-allocated arrays (e.g., `new Array(len)`) combined with simple `for` loops before `sort()`, bypassing the overhead of functional iterators and intermediate array copying entirely.
