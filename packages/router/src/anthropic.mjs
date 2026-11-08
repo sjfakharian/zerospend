@@ -29,11 +29,12 @@ export function anthropicToOpenAIPayload(body={}){
         }
       }else if(Array.isArray(m.content)){
         if(role==='assistant'){
-          const textBlocks=[];
+          let combinedText='';
           const toolCalls=[];
           for(const b of m.content){
-            if(typeof b==='string')textBlocks.push(b);
-            else if(b.type==='text'&&b.text)textBlocks.push(b.text);
+            let t = '';
+            if(typeof b==='string')t=b;
+            else if(b.type==='text'&&b.text)t=b.text;
             else if(b.type==='tool_use'){
               toolCalls.push({
                 id:b.id||`call_${randomUUID().replace(/-/g,'').slice(0,8)}`,
@@ -44,8 +45,11 @@ export function anthropicToOpenAIPayload(body={}){
                 }
               });
             }
+            if (t) {
+              if (combinedText.length > 0) combinedText += '\n';
+              combinedText += t;
+            }
           }
-          let combinedText=textBlocks.join('\n');
           if(combinedText.includes('DSML')||combinedText.includes('<tool_call>')){
             const parsed=extractTextToolCalls(combinedText);
             if(parsed.toolCalls.length>0){
@@ -57,11 +61,12 @@ export function anthropicToOpenAIPayload(body={}){
           if(toolCalls.length>0)msgObj.tool_calls=toolCalls;
           messages.push(msgObj);
         }else{
-          const textBlocks=[];
+          let userText='';
           const toolResults=[];
           for(const b of m.content){
-            if(typeof b==='string')textBlocks.push(b);
-            else if(b.type==='text'&&b.text)textBlocks.push(b.text);
+            let t = '';
+            if(typeof b==='string')t=b;
+            else if(b.type==='text'&&b.text)t=b.text;
             else if(b.type==='tool_result'){
               let tContent='';
               if(typeof b.content==='string')tContent=b.content;
@@ -77,10 +82,13 @@ export function anthropicToOpenAIPayload(body={}){
                 content:tContent
               });
             }
+            if (t) {
+              if (userText.length > 0) userText += '\n';
+              userText += t;
+            }
           }
           for(const tr of toolResults)messages.push(tr);
-          if(textBlocks.length>0){
-            let userText=textBlocks.join('\n');
+          if(userText.length>0){
             if(userText.includes('DSML'))userText=userText.replace(/<[|｜]DSML[|｜]>/gi,'[tool]');
             messages.push({role:'user',content:userText});
           }
