@@ -32,8 +32,12 @@ export function score(result,category){
   }else if(result?.global&&typeof result.global.arena_elo==='number'){
     globalVal=Math.min(1,Math.max(0,(result.global.arena_elo-1000)/400));
   }
-  const evalResult={...result,global:globalVal};
-  return Number(Object.entries(weights).reduce((n,[k,w])=>n+(Number(evalResult[k])||0)*w,0).toFixed(2));
+  let totalScore = 0;
+  for (const k in weights) {
+    const val = k === 'global' ? globalVal : result?.[k];
+    totalScore += (Number(val) || 0) * weights[k];
+  }
+  return Number(totalScore.toFixed(2));
 }
 
 export function shouldPromote(current,challenger,threshold=7){
