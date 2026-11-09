@@ -37,3 +37,7 @@
 ## 2025-05-18 - Replacing Array methods in payload parsing
 **Learning:** When parsing Anthropic payload formats (which often include deeply nested array structures for text and tools), `.map().join()` and `.map` generate too many intermediate arrays, causing noticeable memory and GC overhead on hot paths.
 **Action:** Use pre-sized arrays for simple maps (`new Array(length)`) and standard `for` loops with manual string concatenation (`+=`) when coalescing text blocks to bypass the GC overhead entirely.
+
+## 2024-05-19 - Replacing Array methods in route filtering
+**Learning:** In the ZeroSpend router, `server.mjs` was using `.filter().map()` to transform the `config.aliases` array and `inventory.routes` into response objects. This creates intermediate arrays and causes unnecessary garbage collection, degrading performance during peak requests on the `/v1/models` endpoint. Also, using `.filter()` during fallback ordering (`candidateRoutes.filter(r=>r!==payload.model)`) generates extra allocations on every request.
+**Action:** Replace chained `.filter().map()` calls with single-pass `for` loops (using pre-allocated arrays where possible) and avoid using `.filter` for array exclusions, instead relying on standard `for` loops.
