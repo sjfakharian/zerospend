@@ -7,3 +7,7 @@
 **Vulnerability:** The application frontend renders incoming log messages into the DOM by concatenating HTML strings via `innerHTML`. In `apps/console/public/app.js`, the log item's text was escaped correctly, but the class name (`l.type`) was directly injected without escaping. This exposes the application to XSS if an attacker can control the log stream payload (e.g. log injection via an unverified provider response).
 **Learning:** Even when the primary content field is escaped, secondary attributes like class names or style tags within the same `innerHTML` assignment can be an XSS vector if they are derived from external data.
 **Prevention:** Consistently use HTML escaping functions (like `esc()`) on *all* data fields injected into HTML templates, regardless of whether they populate visible text or HTML attributes.
+## 2024-05-18 - Fix Length-Based Timing Attack in timingSafeEqual
+**Vulnerability:** `timingSafeEqual` was comparing the user input (`x`) against a fallback of itself, making execution time proportional to the attacker-controlled input length.
+**Learning:** To truly prevent timing attacks, constant-time comparisons must have execution times proportional to the *secret's* length, not the user's input.
+**Prevention:** Always use the secret as the primary buffer and compare it against a fallback of the same length (e.g., `timingSafeEqual(y, match ? x : y)` where `y` is the secret).
