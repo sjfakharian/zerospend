@@ -20,8 +20,21 @@ export function orderRoutes(routes,stats={},options={}){
     else if(str.includes('2.6b')||str.includes('2b')||str.includes('mini')||str.includes('note-preview'))tier=category==='fast'?15:-10;
     return { cool, score: statScore + bench + tier, route: r };
   };
-  return [...routes].map(getScore).sort((a,b)=>{
-    if(a.cool!==b.cool)return a.cool-b.cool;
-    return b.score-a.score;
-  }).map(x=>x.route);
+
+  // Schwartzian Transform: decorate, sort, undecorate
+  const decorated = new Array(routes.length);
+  for (let i = 0; i < routes.length; i++) {
+    decorated[i] = getScore(routes[i]);
+  }
+
+  decorated.sort((a,b) => {
+    if (a.cool !== b.cool) return a.cool - b.cool;
+    return b.score - a.score;
+  });
+
+  const result = new Array(decorated.length);
+  for (let i = 0; i < decorated.length; i++) {
+    result[i] = decorated[i].route;
+  }
+  return result;
 }
