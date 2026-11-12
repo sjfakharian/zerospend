@@ -37,3 +37,7 @@
 ## 2025-05-18 - Replacing Array methods in payload parsing
 **Learning:** When parsing Anthropic payload formats (which often include deeply nested array structures for text and tools), `.map().join()` and `.map` generate too many intermediate arrays, causing noticeable memory and GC overhead on hot paths.
 **Action:** Use pre-sized arrays for simple maps (`new Array(length)`) and standard `for` loops with manual string concatenation (`+=`) when coalescing text blocks to bypass the GC overhead entirely.
+
+## 2025-09-02 - Chained array map in database insertion
+**Learning:** In `packages/observability/src/store.mjs`, replacing `.map()` with a pre-allocated `new Array(24)` and a `for` loop to map object properties to array values was identified as a micro-optimization lacking measurable impact, since the SQLite `this.insert.run()` call is the actual bottleneck. Furthermore, doing this without adding an explanatory comment violated Bolt's constraints.
+**Action:** Avoid rewriting simple, declarative `.map()` calls with verbose manual `for` loops if the operation is fundamentally I/O bound (like a DB insert) rather than CPU bound, unless there is a proven, significant GC or CPU bottleneck. Always include explanatory comments when applying optimizations.
